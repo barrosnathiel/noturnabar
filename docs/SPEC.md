@@ -131,7 +131,9 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - O `CSS3DRenderer` fica em `#css3d` com `z-index: 0` e o canvas com `z-index: 1`. Geometria na frente do telão continua ocultando ele, porque é desenhada no WebGL por cima do furo.
 - `sound/venue.js` usa a IFrame API para o volume. O volume vem da distância até a caixa de som mais próxima, de 100 colado nela a 18 no limite de 46m. O player começa mudo porque autoplay com som é bloqueado. Todo clique, tecla e toque tenta `unMute`, e a tentativa só é dada por encerrada quando o player confirma que saiu do mudo.
 
-Duas armadilhas que já custaram um bug de som que só aparecia na máquina dos outros: desmutar uma vez só, no momento do pointer lock, perde a janela quando a API do YouTube ainda não terminou de carregar; e o handler de `pointerlockchange` não é um gesto do usuário, então o navegador pode recusar o `unMute` ali. Enquanto o som está mudo, o HUD mostra um aviso — sem ele, ninguém descobre que precisa clicar.
+O volume é aplicado sempre que o player está pronto, sem depender de o som já ter sido ligado. `isMuted()` responde pelo estado em cache da IFrame API, que é alimentado por mensagem assíncrona: lido logo depois do `unMute()` ele ainda devolve o valor velho. Usar essa leitura como condição para aplicar volume deixava o player desmutado e em volume zero — vídeo rodando, silêncio. Hoje ela serve só para o aviso do HUD, com cache de 400ms.
+
+Duas outras armadilhas que já custaram um bug de som que só aparecia na máquina dos outros: desmutar uma vez só, no momento do pointer lock, perde a janela quando a API do YouTube ainda não terminou de carregar; e o handler de `pointerlockchange` não é um gesto do usuário, então o navegador pode recusar o `unMute` ali. Enquanto o som está mudo, o HUD mostra um aviso — sem ele, ninguém descobre que precisa clicar.
 
 ## Materiais
 `MeshStandardMaterial` em tudo. Paleta base:

@@ -4,8 +4,9 @@ const FAR = 46
 export function createVenueSound(iframe, speakers) {
   let player = null
   let ready = false
-  let unlocked = false
   let current = -1
+  let mutedCache = true
+  let checkedAt = 0
 
   const tag = document.createElement('script')
   tag.src = 'https://www.youtube.com/iframe_api'
@@ -16,7 +17,7 @@ export function createVenueSound(iframe, speakers) {
       events: {
         onReady: () => {
           ready = true
-          player.setVolume(0)
+          player.setVolume(50)
           player.playVideo()
         }
       }
@@ -24,14 +25,27 @@ export function createVenueSound(iframe, speakers) {
   }
 
   function unlock() {
-    if (!ready || unlocked) return
+    if (!ready) return
     try {
       player.unMute()
       player.playVideo()
-      unlocked = !player.isMuted()
     } catch (error) {
-      unlocked = false
+      void error
     }
+  }
+
+  function isOn() {
+    if (!ready) return false
+    const now = performance.now()
+    if (now - checkedAt > 400) {
+      checkedAt = now
+      try {
+        mutedCache = player.isMuted()
+      } catch (error) {
+        mutedCache = true
+      }
+    }
+    return !mutedCache
   }
 
   function loudness(position) {
@@ -50,12 +64,16 @@ export function createVenueSound(iframe, speakers) {
   }
 
   function update(position) {
-    if (!ready || !unlocked) return
+    if (!ready) return
     const target = Math.round(loudness(position) * 100)
     if (target === current) return
     current = target
-    player.setVolume(target)
+    try {
+      player.setVolume(target)
+    } catch (error) {
+      void error
+    }
   }
 
-  return { update, unlock, isReady: () => ready, isOn: () => unlocked, volumeFor: (position) => Math.round(loudness(position) * 100) }
+  return { update, unlock, isReady: () => ready, isOn, volumeFor: (position) => Math.round(loudness(position) * 100) }
 }
