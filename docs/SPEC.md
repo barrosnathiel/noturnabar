@@ -123,6 +123,14 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - Intensidade em unidades físicas (iluminância cai com o quadrado da distância): spot do palco 2600, ponto de serviço na casa dos 350 a 420, bar 42. Mexer nesses números sem considerar `distance` e `decay` apaga ou estoura a cena.
 - `FogExp2` com densidade 0.012, cor igual ao fundo
 
+## Telão e som
+
+- `world/screen.js` monta três coisas no mesmo lugar: a moldura em WebGL, um plano de "furo" e o player do YouTube como `CSS3DObject`.
+- O furo é um `MeshBasicMaterial` com `blending: NoBlending` **e `opacity: 0`**. Sem a opacidade zero ele escreve alpha 1 e pinta um retângulo preto opaco, que foi exatamente o primeiro sintoma. Com alpha 0 o canvas fica transparente ali e o iframe, que está numa camada abaixo, aparece.
+- Por isso o renderer precisa de `alpha: true`, `setClearColor(0x07070a, 0)` e `scene.background` nulo; o fundo preto vem do CSS do `body`.
+- O `CSS3DRenderer` fica em `#css3d` com `z-index: 0` e o canvas com `z-index: 1`. Geometria na frente do telão continua ocultando ele, porque é desenhada no WebGL por cima do furo.
+- `sound/venue.js` usa a IFrame API para o volume. O volume vem da distância até a caixa de som mais próxima, de 100 colado nela a 18 no limite de 46m. O player começa mudo porque autoplay com som é bloqueado; o primeiro gesto do jogador (travar o mouse ou tocar na tela) chama `unMute`.
+
 ## Materiais
 `MeshStandardMaterial` em tudo. Paleta base:
 

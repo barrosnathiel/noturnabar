@@ -42,6 +42,10 @@ Funciona em paisagem. Em retrato a tela pede para girar o aparelho.
 
 O primeiro toque na tela já tenta entrar em tela cheia e travar em paisagem. No iPhone isso não existe: o Safari não deixa um site entrar em tela cheia, então o jeito de jogar sem as barras é Compartilhar e Adicionar à Tela de Início, que abre pelo manifest em paisagem.
 
+## Telão
+
+O fundo do palco tem um telão tocando vídeo, e o volume acompanha a sua distância até as caixas de som: colado nelas é 100, no meio da pista 74, lá no hall 37. O som começa mudo e liga no primeiro clique ou toque, porque navegador nenhum deixa um site tocar som sozinho.
+
 ## Stack
 
 Three.js e Vite, JavaScript puro. A colisão é própria: AABB contra um grid espacial, com step-up de 0.45m para escada e degrau. Sem engine de física.

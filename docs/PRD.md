@@ -22,8 +22,8 @@ Uma pessoa, no desktop, com teclado e mouse, abrindo uma URL. Sem login, sem sav
 ### Fora (não implementar na v1)
 - Multiplayer, rede, qualquer servidor além do de arquivos estáticos
 - Público, NPC, qualquer personagem além do jogador
-- Áudio: música, passos, ambiente
-- Show acontecendo: banda, luz sincronizada, telão
+- Áudio próprio: passos, ambiente, qualquer som que não venha do telão
+- Show acontecendo: banda, luz sincronizada
 - Mundo aberto, rua, qualquer coisa fora do galpão
 - Interiores de banheiro e camarim (porta fechada é o limite)
 - Interagir com objeto: abrir porta, pegar copo, sentar
@@ -42,6 +42,13 @@ Cada item da lista de fora pode virar v2. Entrar na v1 só com pedido explícito
 - Sem pointer lock no toque: ele não existe em touch e nem é necessário.
 
 O que continua fora no celular: gamepad, giroscópio, vibração e qualquer ajuste de qualidade feito pelo usuário.
+
+**18/10/2026 — telão e som entram na v1.** Um telão no fundo do palco toca um vídeo do YouTube, e o volume acompanha a distância do jogador até as caixas de som.
+
+Dois limites que vêm da plataforma, não de escolha nossa:
+
+- O vídeo não vira textura 3D. O player do YouTube é de outra origem e não entrega os pixels para o WebGL; baixar o arquivo violaria os termos. O player oficial é embutido no espaço 3D e um furo no canvas deixa ele aparecer no lugar certo, com a geometria da casa ainda ocultando o que passa na frente.
+- O som do player não pode ser espacializado. Pelo mesmo motivo de origem, o Web Audio não alcança o áudio do iframe, então não existe panning por caixa. O que dá é controlar o volume do player pela distância. Estéreo de verdade por caixa só com um arquivo de áudio nosso, e isso continua fora.
 
 ## Critérios de aceite
 A v1 está pronta quando, num notebook comum:

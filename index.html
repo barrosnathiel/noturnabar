@@ -12,8 +12,10 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { height: 100%; overflow: hidden; background: #07070a; overscroll-behavior: none; }
       body { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
-      canvas { display: block; }
-      #hud { position: fixed; inset: 0; pointer-events: none; font-family: ui-monospace, Menlo, monospace; color: #d8d8e0; }
+      canvas { display: block; position: relative; z-index: 1; }
+      #css3d { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+      #css3d * { pointer-events: none; }
+      #hud { position: fixed; inset: 0; z-index: 2; pointer-events: none; font-family: ui-monospace, Menlo, monospace; color: #d8d8e0; }
       #crosshair { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: #e8e8f0; opacity: .75; box-shadow: 0 0 3px #000; }
       #fps { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: calc(14px + env(safe-area-inset-right)); font-size: 12px; opacity: .6; letter-spacing: .5px; }
       #help { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(10,10,14,.82); border: 1px solid rgba(255,255,255,.12); padding: 22px 28px; border-radius: 6px; font-size: 13px; line-height: 1.9; text-align: center; transition: opacity .35s ease; }
@@ -43,6 +45,7 @@
     </style>
   </head>
   <body>
+    <div id="css3d"></div>
     <div id="hud">
       <div id="crosshair"></div>
       <div id="fps">-- fps</div>
