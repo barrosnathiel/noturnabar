@@ -1,4 +1,4 @@
-const PADRAO = ''
+const PADRAO = 'wss://noturnabar.onrender.com'
 const RECONEXAO = 4000
 
 export function conectarSala(crowd, aoEntrar) {
