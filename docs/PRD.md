@@ -20,8 +20,7 @@ Uma pessoa, no desktop, com teclado e mouse, abrindo uma URL. Sem login, sem sav
 6. Roda em Chrome, Firefox e Safari desktop atuais.
 
 ### Fora (não implementar na v1)
-- Multiplayer, rede, qualquer servidor além do de arquivos estáticos
-- Público, NPC, qualquer personagem além do jogador
+- Público e NPC: ninguém na casa além dos jogadores de verdade
 - Áudio próprio: passos, ambiente, qualquer som que não venha do telão
 - Show acontecendo: banda, luz sincronizada
 - Mundo aberto, rua, qualquer coisa fora do galpão
@@ -44,6 +43,10 @@ Cada item da lista de fora pode virar v2. Entrar na v1 só com pedido explícito
 O que continua fora no celular: gamepad, giroscópio, vibração e qualquer ajuste de qualidade feito pelo usuário.
 
 **18/10/2026 — telão e som entram na v1.** Um telão no fundo do palco toca um vídeo do YouTube, e o volume acompanha a distância do jogador até as caixas de som.
+
+**18/10/2026 — multiplayer básico entra na v1.** Quem entra ganha um avatar sorteado entre dois, um ET e um porco bípede, e vê os outros andando pela casa. Nada além disso: sem voz, sem texto, sem nome em cima da cabeça, sem interação entre jogadores.
+
+O front continua estático na Vercel e a sala vira um processo Node com WebSocket no Render. Sem a variável do servidor configurada, o jogo roda sozinho como antes.
 
 Dois limites que vêm da plataforma, não de escolha nossa:
 

@@ -9,6 +9,7 @@ import { createControls } from './player/controls.js'
 import { createTouchInput } from './player/touch.js'
 import { createHud } from './hud/index.js'
 import { createVenueSound } from './sound/venue.js'
+import { createCrowd } from './actors/crowd.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
 const coarse = window.matchMedia('(pointer: coarse)').matches
@@ -39,6 +40,15 @@ const venue = createVenueSound(videoWall.iframe, [
   new THREE.Vector3(12.2, 1.75, -8.6),
   new THREE.Vector3(12.2, 2.75, -8.6)
 ])
+
+const crowd = createCrowd(scene)
+const demo = new URLSearchParams(location.search).has('teste')
+const rotas = [
+  { id: 'teste-1', kind: 'et', centro: [4, 0, 3], raio: 3.5, velocidade: 0.5, fase: 0 },
+  { id: 'teste-2', kind: 'porco', centro: [-2, 0, -4], raio: 4, velocidade: 0.38, fase: 2 },
+  { id: 'teste-3', kind: 'et', centro: [15.5, 1.2, 0], raio: 2.6, velocidade: 0.6, fase: 4 }
+]
+if (demo) rotas.forEach((rota) => crowd.spawn(rota.id, rota.kind))
 
 const world = createCollisionWorld(colliders)
 const player = createPlayer(world, new THREE.Vector3(-18, 0, 0))
@@ -91,6 +101,20 @@ function frame(now = performance.now()) {
   player.update(dt, input, controls.forward, controls.right)
   camera.position.set(player.position.x, player.position.y + PLAYER.eye, player.position.z)
   controls.apply()
+  if (demo) {
+    const t = performance.now() / 1000
+    for (const rota of rotas) {
+      const a = t * rota.velocidade + rota.fase
+      crowd.place(
+        rota.id,
+        rota.centro[0] + Math.cos(a) * rota.raio,
+        rota.centro[1],
+        rota.centro[2] + Math.sin(a) * rota.raio,
+        -a + Math.PI / 2
+      )
+    }
+  }
+  crowd.update(dt)
   hud.tick(dt)
   venue.update(camera.position)
   hud.soundState(venue.isReady(), venue.isOn())
@@ -101,7 +125,7 @@ function frame(now = performance.now()) {
 
 frame()
 
-window.game = { scene, camera, renderer, player, world, controls, videoWall, venue }
+window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd }
 window.stats = () => ({
   drawCalls: renderer.info.render.calls,
   triangles: renderer.info.render.triangles,

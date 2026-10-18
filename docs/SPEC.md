@@ -123,6 +123,15 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - Intensidade em unidades físicas (iluminância cai com o quadrado da distância): spot do palco 2600, ponto de serviço na casa dos 350 a 420, bar 42. Mexer nesses números sem considerar `distance` e `decay` apaga ou estoura a cena.
 - `FogExp2` com densidade 0.012, cor igual ao fundo
 
+## Avatares
+
+- `actors/avatar.js` monta os dois tipos com primitivas e devolve `root` mais um `update(dt, speed)`. Geometrias e materiais ficam em cache por tipo, então o segundo ET não recria nada.
+- A animação é um ciclo de caminhada simples: pernas e braços oscilam em torno dos pivôs com amplitude proporcional à velocidade, mais um sobe-e-desce do tronco. Com velocidade zero ele para em pé.
+- O ET tem passo longo e o porco passo curto (`stride` em cada skin), que é o que faz os dois andarem diferente sem animação própria.
+- `actors/crowd.js` guarda quem está na sala, interpola posição e ângulo entre as atualizações que chegam da rede e aplica o `update` de cada um. É ele que a camada de rede vai alimentar.
+- Custo: cerca de 4 a 5 draw calls por avatar. O teto de 150 vale para a casa vazia; com 40 pessoas isso passa de 190 e aí será preciso instanciar os membros ou simplificar quem está longe. Até umas 20 pessoas não há o que fazer.
+- `?teste=1` na URL liga três avatares de demonstração circulando pela casa, sem rede nenhuma.
+
 ## Telão e som
 
 - `world/screen.js` monta três coisas no mesmo lugar: a moldura em WebGL, um plano de "furo" e o player do YouTube como `CSS3DObject`.
