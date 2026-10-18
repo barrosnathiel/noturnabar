@@ -27,6 +27,8 @@ Abre em http://localhost:3490.
 | W A S D | andar |
 | Shift | correr |
 | Espaço | pular |
+| 1, 2, 3 | dançar: balanço, mãos pro alto, solto |
+| Botão direito | menu de dança em volta da mira |
 
 ## No celular
 
@@ -38,6 +40,7 @@ Funciona em paisagem. Em retrato a tela pede para girar o aparelho.
 | Arrastar na metade direita | olhar |
 | PULO | pular |
 | CORRER | liga e desliga a corrida |
+| Barra embaixo | escolhe a dança |
 | TELA CHEIA | entra em tela cheia e trava a orientação |
 
 O primeiro toque na tela já tenta entrar em tela cheia e travar em paisagem. No iPhone isso não existe: o Safari não deixa um site entrar em tela cheia, então o jeito de jogar sem as barras é Compartilhar e Adicionar à Tela de Início, que abre pelo manifest em paisagem.

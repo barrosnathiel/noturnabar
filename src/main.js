@@ -7,6 +7,7 @@ import { createCollisionWorld } from './player/collision.js'
 import { createPlayer, PLAYER } from './player/physics.js'
 import { createControls } from './player/controls.js'
 import { createTouchInput } from './player/touch.js'
+import { createAcoes } from './player/acoes.js'
 import { createHud } from './hud/index.js'
 import { createVenueSound } from './sound/venue.js'
 import { createCrowd } from './actors/crowd.js'
@@ -59,6 +60,7 @@ const world = createCollisionWorld(colliders)
 const player = createPlayer(world, new THREE.Vector3(-18, 0, 0))
 const touch = createTouchInput()
 const controls = createControls(camera, renderer.domElement, touch)
+const acoes = createAcoes(touch)
 const hud = createHud()
 
 controls.onLockChange((locked) => {
@@ -119,7 +121,8 @@ function frame(now = performance.now()) {
       )
     }
   }
-  sala.enviar(player.position, camera.rotation.y)
+  if (input.forward !== 0 || input.strafe !== 0 || input.jump) acoes.andou()
+  sala.enviar(player.position, camera.rotation.y, acoes.atual())
   crowd.update(dt)
   hud.tick(dt)
   venue.update(camera.position)
@@ -131,7 +134,7 @@ function frame(now = performance.now()) {
 
 frame()
 
-window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd, sala }
+window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd, sala, acoes }
 window.stats = () => ({
   drawCalls: renderer.info.render.calls,
   triangles: renderer.info.render.triangles,

@@ -144,6 +144,8 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - Braço e perna têm dois segmentos cada, com uma esfera centrada no pivô da dobra. É ela que fecha a junta quando o cotovelo e o joelho dobram; sem a esfera abre fresta e o membro lê como duas peças encaixadas.
 - Tentei antes uma malha única com esqueleto (`SkinnedMesh`) e ficou pior: o corpo é um conjunto de peças sobrepostas, e ao deformar cada peça entorta por conta própria e elas se atravessam. Skinning aqui só valeria com uma casca contínua de verdade; `actors/corpo.js` guarda os helpers de geometria que sobraram dessa tentativa.
 - Custo medido: cerca de 6 draw calls por avatar. O teto de 150 vale para a casa vazia (30); com 20 pessoas fica em 150. A saída, quando encher, é `InstancedMesh` por parte e por tipo.
+- Acionamento em `player/acoes.js`: botão direito segurado abre um menu em volta da mira e a direção do mouse escolhe; teclas 1, 2 e 3 ligam e desligam direto; no celular é a barra de pílulas na base. O `contextmenu` do navegador é bloqueado, senão o menu do sistema abre por cima do jogo. No trackpad do Mac o botão direito é o clique de dois dedos, que é desconfortável de segurar e arrastar — por isso as teclas existem, não são só atalho.
+- Andar cancela a dança: `acoes.andou()` é chamado quando há entrada de movimento.
 - As danças são três (`balanco`, `maos`, `solto`) e vivem no mesmo `update`, que só dança quando o jogador está praticamente parado. O movimento soma duas ou três senoides de frequências diferentes e defasa um lado do outro — uma senoide só lê como robô.
 - `?teste=1` na URL liga três avatares de demonstração circulando pela casa, sem rede nenhuma.
 
