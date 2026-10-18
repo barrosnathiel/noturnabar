@@ -2,11 +2,11 @@ import * as THREE from 'three'
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { materials as M } from './materials.js'
 
-const VIDEO_ID = 'nq-YBglL0Zo'
-const WIDTH = 12.5
-const HEIGHT = 7.03
+const VIDEO_ID = 'qfYwoaBSOm8'
+const WIDTH = 16
+const HEIGHT = 9
 const PIXELS = 1280
-const CENTER = new THREE.Vector3(19.5, 5.2, 0)
+const CENTER = new THREE.Vector3(19.5, 5.9, 0)
 
 export function buildScreen(scene) {
   const frame = new THREE.Mesh(

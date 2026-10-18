@@ -57,7 +57,7 @@ export function buildStage(b) {
     b.shape(monitor, M.speaker, { collide: true })
   }
 
-  b.box(0.2, 7.5, d, 19.8, STAGE.top + 3.75, cz, M.rubber)
+  b.box(0.2, 10.2, d, 19.8, STAGE.top + 5.1, cz, M.rubber)
 
   trussAlongZ(b, 12.5, -10.5, 10.5, TRUSS_Y)
   trussAlongZ(b, 17, -10.5, 10.5, TRUSS_Y)
