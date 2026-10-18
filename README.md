@@ -28,10 +28,13 @@ Funciona em paisagem. Em retrato a tela pede para girar o aparelho.
 | Controle | Ação |
 |---|---|
 | Joystick à esquerda | andar |
-| Arrastar no resto da tela | olhar |
+| Joystick à direita | girar a câmera, em velocidade constante |
+| Arrastar na tela | olhar, para mira rápida |
 | PULO | pular |
 | CORRER | liga e desliga a corrida |
 | TELA CHEIA | entra em tela cheia e trava a orientação |
+
+O primeiro toque na tela já tenta entrar em tela cheia e travar em paisagem. No iPhone isso não existe: o Safari não deixa um site entrar em tela cheia, então o jeito de jogar sem as barras é Compartilhar e Adicionar à Tela de Início, que abre pelo manifest em paisagem.
 
 ## Stack
 

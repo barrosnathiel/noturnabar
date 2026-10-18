@@ -88,11 +88,14 @@ Treliça: uma sobre o palco (X 11 a 20, Y 9) e duas sobre a pista (X -2 e X 5, Y
 
 - Detecção por `navigator.maxTouchPoints > 0` e `(pointer: coarse)`. Só aí o `body` ganha a classe `touch` e os controles aparecem.
 - Joystick analógico: a magnitude do deslocamento vira `input.scale`, que multiplica a velocidade, então dá para andar devagar. Zona morta de 0.14.
-- Olhar: qualquer arraste que não comece dentro de `#touch`. O handler checa `event.target instanceof Element` antes do `closest`, senão um evento cujo alvo não é elemento derruba o listener.
+- Dois joysticks: o esquerdo anda, o direito gira. O direito guarda uma velocidade angular (`rate`, rad/s) aplicada por frame, por isso `controls.sample` recebe o `dt`.
+- Olhar: qualquer arraste que não comece dentro de `#touch`. Convive com o joystick direito de propósito — joystick para giro contínuo, arraste para mira rápida. O handler checa `event.target instanceof Element` antes do `closest`, senão um evento cujo alvo não é elemento derruba o listener.
 - Sem pointer lock no toque: o clique no canvas só pede a trava quando não é celular.
 - Corrida é alternada por toque, não segurada: o polegar direito está ocupado olhando.
 - Orientação: classe `portrait` no `body` sincronizada no resize e no orientationchange; em retrato a tela de aviso cobre o jogo. Travar a orientação só funciona dentro de tela cheia, daí o botão.
 - `pixelRatio` cai para 1.25 em ponteiro grosso.
+- O primeiro toque tenta tela cheia e trava a orientação em paisagem, com até três tentativas: pedir tela cheia exige gesto do usuário, então não dá para fazer isso na carga da página.
+- iOS não tem `requestFullscreen` para elementos: o botão vira uma instrução para adicionar à tela de início. O `manifest.json` declara `display: fullscreen` e `orientation: landscape`, que é o que resolve o caso no iPhone.
 
 ## Colisão
 Sem biblioteca de física. O mundo devolve uma lista de AABBs (`THREE.Box3`) e o jogador testa contra ela.

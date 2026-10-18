@@ -58,7 +58,7 @@ let last = performance.now()
 function frame(now = performance.now()) {
   const dt = Math.min((now - last) / 1000, 0.05)
   last = now
-  const input = controls.sample()
+  const input = controls.sample(dt)
   player.update(dt, input, controls.forward, controls.right)
   camera.position.set(player.position.x, player.position.y + PLAYER.eye, player.position.z)
   controls.apply()

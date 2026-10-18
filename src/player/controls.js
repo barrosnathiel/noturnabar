@@ -53,11 +53,11 @@ export function createControls(camera, canvas, touch) {
   window.addEventListener('keyup', (e) => onKey(e, false))
   window.addEventListener('blur', () => keys.clear())
 
-  function sample() {
+  function sample(dt = 0) {
     if (touch.supported) {
-      const move = touch.consumeLook()
-      yaw -= move.dx
-      pitch = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch - move.dy))
+      const move = touch.consumeDrag()
+      yaw -= move.dx + touch.rate.x * dt
+      pitch = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch - move.dy - touch.rate.y * dt))
       input.forward = touch.state.forward
       input.strafe = touch.state.strafe
       input.run = touch.state.run
