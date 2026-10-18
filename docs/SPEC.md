@@ -29,7 +29,8 @@ casadeshow/
       materials.js       paleta e materiais compartilhados
       builder.js         acumula geometria por material, mergeia e junta os colisores
     player/
-      controls.js        pointer lock, teclado, mouse
+      controls.js        pointer lock, teclado, mouse, e a entrada de toque quando é celular
+      touch.js           joystick, arraste de olhar, botões de pulo e corrida, tela cheia
       physics.js         gravidade, pulo, step-up
       collision.js       AABB do jogador contra a lista de colisores
     lighting/
@@ -82,6 +83,16 @@ Treliça: uma sobre o palco (X 11 a 20, Y 9) e duas sobre a pista (X -2 e X 5, Y
 | W A S D | andar |
 | Shift | correr |
 | Espaço | pular |
+
+## Celular
+
+- Detecção por `navigator.maxTouchPoints > 0` e `(pointer: coarse)`. Só aí o `body` ganha a classe `touch` e os controles aparecem.
+- Joystick analógico: a magnitude do deslocamento vira `input.scale`, que multiplica a velocidade, então dá para andar devagar. Zona morta de 0.14.
+- Olhar: qualquer arraste que não comece dentro de `#touch`. O handler checa `event.target instanceof Element` antes do `closest`, senão um evento cujo alvo não é elemento derruba o listener.
+- Sem pointer lock no toque: o clique no canvas só pede a trava quando não é celular.
+- Corrida é alternada por toque, não segurada: o polegar direito está ocupado olhando.
+- Orientação: classe `portrait` no `body` sincronizada no resize e no orientationchange; em retrato a tela de aviso cobre o jogo. Travar a orientação só funciona dentro de tela cheia, daí o botão.
+- `pixelRatio` cai para 1.25 em ponteiro grosso.
 
 ## Colisão
 Sem biblioteca de física. O mundo devolve uma lista de AABBs (`THREE.Box3`) e o jogador testa contra ela.

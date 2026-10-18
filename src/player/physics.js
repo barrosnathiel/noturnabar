@@ -126,7 +126,7 @@ export function createPlayer(world, spawn) {
   }
 
   function update(dt, input, forward, right) {
-    const speed = input.run ? PLAYER.run : PLAYER.walk
+    const speed = (input.run ? PLAYER.run : PLAYER.walk) * (input.scale ?? 1)
     const wishX = forward.x * input.forward + right.x * input.strafe
     const wishZ = forward.z * input.forward + right.z * input.strafe
     const length = Math.hypot(wishX, wishZ)

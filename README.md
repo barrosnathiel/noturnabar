@@ -21,6 +21,18 @@ Abre em http://localhost:3490.
 | Shift | correr |
 | Espaço | pular |
 
+## No celular
+
+Funciona em paisagem. Em retrato a tela pede para girar o aparelho.
+
+| Controle | Ação |
+|---|---|
+| Joystick à esquerda | andar |
+| Arrastar no resto da tela | olhar |
+| PULO | pular |
+| CORRER | liga e desliga a corrida |
+| TELA CHEIA | entra em tela cheia e trava a orientação |
+
 ## Stack
 
 Three.js e Vite, JavaScript puro. A colisão é própria: AABB contra um grid espacial, com step-up de 0.45m para escada e degrau. Sem engine de física.

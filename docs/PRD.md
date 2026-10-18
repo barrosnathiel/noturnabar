@@ -27,10 +27,21 @@ Uma pessoa, no desktop, com teclado e mouse, abrindo uma URL. Sem login, sem sav
 - Mundo aberto, rua, qualquer coisa fora do galpão
 - Interiores de banheiro e camarim (porta fechada é o limite)
 - Interagir com objeto: abrir porta, pegar copo, sentar
-- Menu, configurações, save, mobile, gamepad, VR
+- Menu, configurações, save, gamepad, VR
 - Modelo 3D externo, textura em arquivo de imagem, asset baixado
 
 Cada item da lista de fora pode virar v2. Entrar na v1 só com pedido explícito.
+
+### Mudanças de escopo
+
+**18/10/2026 — celular entra na v1.** Mobile estava na lista de fora e saiu dela a pedido. O que entra:
+
+- Controles de toque na tela: joystick analógico à esquerda para andar, arrastar do lado direito para olhar, botão de pulo e botão de correr.
+- Funciona em paisagem. Em retrato, a tela pede para girar o aparelho em vez de tentar jogar deitado.
+- Botão de tela cheia, que é o que permite travar a orientação.
+- Sem pointer lock no toque: ele não existe em touch e nem é necessário.
+
+O que continua fora no celular: gamepad, giroscópio, vibração e qualquer ajuste de qualidade feito pelo usuário.
 
 ## Critérios de aceite
 A v1 está pronta quando, num notebook comum:

@@ -4,10 +4,12 @@ import { buildLighting } from './lighting/index.js'
 import { createCollisionWorld } from './player/collision.js'
 import { createPlayer, PLAYER } from './player/physics.js'
 import { createControls } from './player/controls.js'
+import { createTouchInput } from './player/touch.js'
 import { createHud } from './hud/index.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' })
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
+const coarse = window.matchMedia('(pointer: coarse)').matches
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, coarse ? 1.25 : 1.5))
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFShadowMap
@@ -26,12 +28,17 @@ buildLighting(scene)
 
 const world = createCollisionWorld(colliders)
 const player = createPlayer(world, new THREE.Vector3(-18, 0, 0))
-const controls = createControls(camera, renderer.domElement)
+const touch = createTouchInput()
+const controls = createControls(camera, renderer.domElement, touch)
 const hud = createHud()
 
 controls.onLockChange((locked) => {
   if (locked) hud.dismissHelp()
 })
+
+if (touch.supported) {
+  window.addEventListener('pointerdown', () => hud.dismissHelp(), { once: true })
+}
 
 controls.onLockError(() => {
   hud.notice('este navegador não liberou a trava do mouse aqui<br />abra <b>http://localhost:3490</b> numa aba normal')
