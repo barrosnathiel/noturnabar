@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Casa de Show</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; overflow: hidden; background: #07070a; }
+      canvas { display: block; }
+      #hud { position: fixed; inset: 0; pointer-events: none; font-family: ui-monospace, Menlo, monospace; color: #d8d8e0; }
+      #crosshair { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: #e8e8f0; opacity: .75; box-shadow: 0 0 3px #000; }
+      #fps { position: absolute; top: 12px; right: 14px; font-size: 12px; opacity: .6; letter-spacing: .5px; }
+      #help { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(10,10,14,.82); border: 1px solid rgba(255,255,255,.12); padding: 22px 28px; border-radius: 6px; font-size: 13px; line-height: 1.9; text-align: center; transition: opacity .35s ease; }
+      #help b { color: #fff; font-weight: 600; }
+      #help .t { font-size: 15px; letter-spacing: 2px; margin-bottom: 10px; opacity: .85; }
+      #help.hidden { opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="hud">
+      <div id="crosshair"></div>
+      <div id="fps">-- fps</div>
+      <div id="help">
+        <div class="t">CASA DE SHOW</div>
+        <b>clique</b> para entrar &nbsp;·&nbsp; <b>ESC</b> para sair<br />
+        <b>WASD</b> andar &nbsp;·&nbsp; <b>shift</b> correr &nbsp;·&nbsp; <b>espaço</b> pular
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
