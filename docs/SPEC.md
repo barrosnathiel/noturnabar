@@ -131,6 +131,7 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - Ao conectar, o servidor atribui id e sorteia o avatar; o cliente não escolhe. Também manda a lista de quem já estava na casa.
 - O cliente envia a própria posição no máximo 15 vezes por segundo; o servidor rebate o estado na mesma cadência, sempre sem o registro do próprio destinatário — por isso ninguém vê o próprio avatar.
 - `crowd.place` guarda a posição alvo e `crowd.update` interpola até lá, senão o movimento sairia aos pulos de pacote em pacote.
+- O yaw que trafega é o da câmera, que olha para -Z, mas os avatares são montados com o rosto para +Z. Por isso `crowd` soma meia volta ao aplicar a rotação. Sem isso todo mundo aparece de costas exatamente quando está de frente.
 - Posição com número não finito é descartada no servidor, quem fica 20 segundos sem mandar nada é desconectado, e a sala para em 40 pessoas.
 - `src/net/sala.js` tem a constante `PADRAO` com a URL do servidor; `?sala=ws://...` sobrescreve para testar local. Com a constante vazia o jogo roda sozinho, sem rede.
 

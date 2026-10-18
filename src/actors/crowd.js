@@ -44,7 +44,7 @@ export function createCrowd(scene) {
       while (diff > Math.PI) diff -= Math.PI * 2
       while (diff < -Math.PI) diff += Math.PI * 2
       person.yaw += diff * Math.min(1, dt * 9)
-      root.rotation.y = person.yaw
+      root.rotation.y = person.yaw + Math.PI
       person.avatar.update(dt, person.speed)
       person.speed *= Math.max(0, 1 - dt * 3)
     }
