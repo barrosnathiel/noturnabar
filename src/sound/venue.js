@@ -1,7 +1,17 @@
 const NEAR = 5
 const FAR = 46
 
-export function createVenueSound(iframe, speakers) {
+export function createVenueSound(iframe, speakers, ligado = true) {
+  if (!ligado) {
+    return {
+      update: () => {},
+      unlock: () => {},
+      isReady: () => false,
+      isOn: () => false,
+      volumeFor: () => 0
+    }
+  }
+
   let player = null
   let ready = false
   let current = -1

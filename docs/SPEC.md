@@ -141,8 +141,10 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - A animação é um ciclo de caminhada simples: pernas e braços oscilam em torno dos pivôs com amplitude proporcional à velocidade, mais um sobe-e-desce do tronco. Com velocidade zero ele para em pé.
 - O ET tem passo longo e o porco passo curto (`stride` em cada skin), que é o que faz os dois andarem diferente sem animação própria.
 - `actors/crowd.js` guarda quem está na sala, interpola posição e ângulo entre as atualizações que chegam da rede e aplica o `update` de cada um. É ele que a camada de rede vai alimentar.
-- Cada avatar são 7 meshes, um por material móvel: tronco, cabeça, rosto, duas pernas e dois braços. As partes que não se movem entre si são mergeadas dentro de cada um desses, por isso o detalhe subiu sem multiplicar draw call.
-- Custo medido: 7 draw calls e cerca de 2.400 triângulos por avatar. O teto de 150 vale para a casa vazia (30); com 15 pessoas fica em 135, com 40 passa de 300. A saída, quando encher, é um `InstancedMesh` por parte e por tipo, o que deixaria o custo fixo em 7 por tipo em vez de 7 por pessoa.
+- Braço e perna têm dois segmentos cada, com uma esfera centrada no pivô da dobra. É ela que fecha a junta quando o cotovelo e o joelho dobram; sem a esfera abre fresta e o membro lê como duas peças encaixadas.
+- Tentei antes uma malha única com esqueleto (`SkinnedMesh`) e ficou pior: o corpo é um conjunto de peças sobrepostas, e ao deformar cada peça entorta por conta própria e elas se atravessam. Skinning aqui só valeria com uma casca contínua de verdade; `actors/corpo.js` guarda os helpers de geometria que sobraram dessa tentativa.
+- Custo medido: cerca de 6 draw calls por avatar. O teto de 150 vale para a casa vazia (30); com 20 pessoas fica em 150. A saída, quando encher, é `InstancedMesh` por parte e por tipo.
+- As danças são três (`balanco`, `maos`, `solto`) e vivem no mesmo `update`, que só dança quando o jogador está praticamente parado. O movimento soma duas ou três senoides de frequências diferentes e defasa um lado do outro — uma senoide só lê como robô.
 - `?teste=1` na URL liga três avatares de demonstração circulando pela casa, sem rede nenhuma.
 
 ## Telão e som

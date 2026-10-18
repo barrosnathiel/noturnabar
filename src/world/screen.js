@@ -7,6 +7,8 @@ const WIDTH = 16
 const HEIGHT = 9
 const PIXELS = 1280
 const CENTER = new THREE.Vector3(19.5, 5.9, 0)
+const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
+const LIGADO = !LOCAL || new URLSearchParams(location.search).has('video')
 
 export function buildScreen(scene) {
   const frame = new THREE.Mesh(
@@ -36,7 +38,7 @@ export function buildScreen(scene) {
   iframe.allow = 'autoplay; encrypted-media; picture-in-picture'
   iframe.src =
     `https://www.youtube.com/embed/${VIDEO_ID}` +
-    '?autoplay=1&mute=1&controls=0&playsinline=1&loop=1' +
+    `?autoplay=${LIGADO ? 1 : 0}&mute=1&controls=0&playsinline=1&loop=1` +
     `&playlist=${VIDEO_ID}&enablejsapi=1&modestbranding=1&rel=0`
   container.appendChild(iframe)
 
@@ -50,5 +52,5 @@ export function buildScreen(scene) {
   glow.position.set(CENTER.x - 2.5, CENTER.y, CENTER.z)
   scene.add(glow)
 
-  return { iframe, center: CENTER }
+  return { iframe, center: CENTER, ligado: LIGADO }
 }

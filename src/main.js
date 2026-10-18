@@ -40,7 +40,7 @@ const venue = createVenueSound(videoWall.iframe, [
   new THREE.Vector3(12.2, 2.75, 8.6),
   new THREE.Vector3(12.2, 1.75, -8.6),
   new THREE.Vector3(12.2, 2.75, -8.6)
-])
+], videoWall.ligado)
 
 const crowd = createCrowd(scene)
 const demo = new URLSearchParams(location.search).has('teste')

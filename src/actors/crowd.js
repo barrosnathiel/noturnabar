@@ -13,15 +13,17 @@ export function createCrowd(scene) {
       previous: new THREE.Vector3(),
       yaw: 0,
       targetYaw: 0,
-      speed: 0
+      speed: 0,
+      acao: 'nada'
     }
     scene.add(avatar.root)
     people.set(id, person)
     return person
   }
 
-  function place(id, x, y, z, yaw) {
+  function place(id, x, y, z, yaw, acao = 'nada') {
     const person = people.get(id) || spawn(id)
+    person.acao = acao
     person.previous.copy(person.target)
     person.target.set(x, y, z)
     person.targetYaw = yaw
@@ -45,7 +47,7 @@ export function createCrowd(scene) {
       while (diff < -Math.PI) diff += Math.PI * 2
       person.yaw += diff * Math.min(1, dt * 9)
       root.rotation.y = person.yaw + Math.PI
-      person.avatar.update(dt, person.speed)
+      person.avatar.update(dt, person.speed, person.acao)
       person.speed *= Math.max(0, 1 - dt * 3)
     }
   }

@@ -34,7 +34,7 @@ export function conectarSala(crowd, aoEntrar) {
         aoEntrar(dados.tipo)
         for (const outro of dados.outros) {
           crowd.spawn(outro.id, outro.tipo)
-          crowd.place(outro.id, outro.x, outro.y, outro.z, outro.yaw)
+          crowd.place(outro.id, outro.x, outro.y, outro.z, outro.yaw, outro.acao)
           vistos.add(outro.id)
         }
         return
@@ -63,7 +63,7 @@ export function conectarSala(crowd, aoEntrar) {
           crowd.spawn(outro.id, outro.tipo)
           vistos.add(outro.id)
         }
-        crowd.place(outro.id, outro.x, outro.y, outro.z, outro.yaw)
+        crowd.place(outro.id, outro.x, outro.y, outro.z, outro.yaw, outro.acao)
       }
       for (const id of [...vistos]) {
         if (presentes.has(id)) continue
@@ -85,7 +85,7 @@ export function conectarSala(crowd, aoEntrar) {
 
   abrir()
 
-  function enviar(position, yaw) {
+  function enviar(position, yaw, acao = 'nada') {
     if (!socket || socket.readyState !== WebSocket.OPEN) return
     const agora = performance.now()
     if (agora - ultimoEnvio < 66) return
@@ -96,7 +96,8 @@ export function conectarSala(crowd, aoEntrar) {
         x: Math.round(position.x * 100) / 100,
         y: Math.round(position.y * 100) / 100,
         z: Math.round(position.z * 100) / 100,
-        yaw: Math.round(yaw * 1000) / 1000
+        yaw: Math.round(yaw * 1000) / 1000,
+        acao
       })
     )
   }
