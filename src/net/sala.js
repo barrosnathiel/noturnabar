@@ -1,8 +1,11 @@
 const PADRAO = 'wss://noturnabar.onrender.com'
 const RECONEXAO = 4000
 
+const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
+
 export function conectarSala(crowd, aoEntrar) {
-  const url = new URLSearchParams(location.search).get('sala') || PADRAO
+  const escolhida = new URLSearchParams(location.search).get('sala')
+  const url = escolhida || (LOCAL ? '' : PADRAO)
   if (!url) return { ativa: () => false, enviar: () => {}, status: () => 'sem servidor' }
 
   let socket = null
