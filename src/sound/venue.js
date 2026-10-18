@@ -25,10 +25,10 @@ export function createVenueSound(iframe, speakers) {
 
   function unlock() {
     if (!ready || unlocked) return
-    unlocked = true
     try {
       player.unMute()
       player.playVideo()
+      unlocked = !player.isMuted()
     } catch (error) {
       unlocked = false
     }
@@ -57,5 +57,5 @@ export function createVenueSound(iframe, speakers) {
     player.setVolume(target)
   }
 
-  return { update, unlock, isReady: () => ready, volumeFor: (position) => Math.round(loudness(position) * 100) }
+  return { update, unlock, isReady: () => ready, isOn: () => unlocked, volumeFor: (position) => Math.round(loudness(position) * 100) }
 }

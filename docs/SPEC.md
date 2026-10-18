@@ -129,7 +129,9 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - O furo é um `MeshBasicMaterial` com `blending: NoBlending` **e `opacity: 0`**. Sem a opacidade zero ele escreve alpha 1 e pinta um retângulo preto opaco, que foi exatamente o primeiro sintoma. Com alpha 0 o canvas fica transparente ali e o iframe, que está numa camada abaixo, aparece.
 - Por isso o renderer precisa de `alpha: true`, `setClearColor(0x07070a, 0)` e `scene.background` nulo; o fundo preto vem do CSS do `body`.
 - O `CSS3DRenderer` fica em `#css3d` com `z-index: 0` e o canvas com `z-index: 1`. Geometria na frente do telão continua ocultando ele, porque é desenhada no WebGL por cima do furo.
-- `sound/venue.js` usa a IFrame API para o volume. O volume vem da distância até a caixa de som mais próxima, de 100 colado nela a 18 no limite de 46m. O player começa mudo porque autoplay com som é bloqueado; o primeiro gesto do jogador (travar o mouse ou tocar na tela) chama `unMute`.
+- `sound/venue.js` usa a IFrame API para o volume. O volume vem da distância até a caixa de som mais próxima, de 100 colado nela a 18 no limite de 46m. O player começa mudo porque autoplay com som é bloqueado. Todo clique, tecla e toque tenta `unMute`, e a tentativa só é dada por encerrada quando o player confirma que saiu do mudo.
+
+Duas armadilhas que já custaram um bug de som que só aparecia na máquina dos outros: desmutar uma vez só, no momento do pointer lock, perde a janela quando a API do YouTube ainda não terminou de carregar; e o handler de `pointerlockchange` não é um gesto do usuário, então o navegador pode recusar o `unMute` ali. Enquanto o som está mudo, o HUD mostra um aviso — sem ele, ninguém descobre que precisa clicar.
 
 ## Materiais
 `MeshStandardMaterial` em tudo. Paleta base:

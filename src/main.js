@@ -53,6 +53,10 @@ controls.onLockChange((locked) => {
   }
 })
 
+for (const gesto of ['pointerdown', 'keydown', 'touchstart']) {
+  window.addEventListener(gesto, () => venue.unlock())
+}
+
 if (touch.supported) {
   window.addEventListener('pointerdown', () => {
     hud.dismissHelp()
@@ -89,6 +93,7 @@ function frame(now = performance.now()) {
   controls.apply()
   hud.tick(dt)
   venue.update(camera.position)
+  hud.soundState(venue.isReady(), venue.isOn())
   renderer.render(scene, camera)
   css.render(scene, camera)
   requestAnimationFrame(frame)

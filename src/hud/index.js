@@ -27,5 +27,16 @@ export function createHud() {
     helpEl.innerHTML = `<div class="t">CASA DE SHOW</div>${text}`
   }
 
-  return { tick, dismissHelp, notice }
+  const soundEl = document.getElementById('sound')
+  let lastSound = null
+
+  function soundState(ready, on) {
+    if (!soundEl) return
+    const show = ready && !on
+    if (show === lastSound) return
+    lastSound = show
+    soundEl.style.display = show ? 'block' : 'none'
+  }
+
+  return { tick, dismissHelp, notice, soundState }
 }
