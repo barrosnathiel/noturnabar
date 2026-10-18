@@ -1,6 +1,6 @@
 const DEAD_ZONE = 0.14
 const DRAG_SPEED = 0.0038
-const STICK_SPEED = 2.6
+const RADIUS = 52
 
 const isIOS = () =>
   /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -15,13 +15,17 @@ export function createTouchInput() {
     return { supported, state, rate, consumeDrag: () => drag, engaged: () => false }
   }
 
-  const moveStick = document.getElementById('stick')
-  const lookStick = document.getElementById('look')
+  const stick = document.getElementById('stick')
+  const knob = stick.querySelector('.knob')
+  const hint = document.getElementById('hint')
   const jump = document.getElementById('jump')
   const run = document.getElementById('run')
   const full = document.getElementById('full')
 
-  let dragId = null
+  let movePointer = null
+  let originX = 0
+  let originY = 0
+  let dragPointer = null
   let lastX = 0
   let lastY = 0
   let touched = false
@@ -30,66 +34,79 @@ export function createTouchInput() {
   document.body.classList.add('touch')
   if (ios) document.body.classList.add('ios')
 
-  function bindStick(element, radius, onMove, onRelease) {
-    const knob = element.querySelector('.knob')
-    let pointer = null
+  const onControl = (target) => target instanceof Element && target.closest('#jump, #run, #full')
 
-    const place = (event) => {
-      const rect = element.getBoundingClientRect()
-      let dx = event.clientX - (rect.left + rect.width / 2)
-      let dy = event.clientY - (rect.top + rect.height / 2)
-      const length = Math.hypot(dx, dy)
-      if (length > radius) {
-        dx = (dx / length) * radius
-        dy = (dy / length) * radius
-      }
-      knob.style.transform = `translate(${dx}px, ${dy}px)`
-      const nx = dx / radius
-      const ny = dy / radius
-      onMove(Math.abs(nx) > DEAD_ZONE ? nx : 0, Math.abs(ny) > DEAD_ZONE ? ny : 0)
-    }
-
-    element.addEventListener('pointerdown', (event) => {
-      event.preventDefault()
-      try { element.setPointerCapture(event.pointerId) } catch (error) { void error }
-      pointer = event.pointerId
-      touched = true
-      place(event)
-    })
-    element.addEventListener('pointermove', (event) => {
-      if (event.pointerId !== pointer) return
-      event.preventDefault()
-      place(event)
-    })
-    const release = (event) => {
-      if (event.pointerId !== pointer) return
-      pointer = null
-      knob.style.transform = 'translate(0px, 0px)'
-      onRelease()
-    }
-    element.addEventListener('pointerup', release)
-    element.addEventListener('pointercancel', release)
+  function placeStick(x, y) {
+    originX = x
+    originY = y
+    stick.style.left = `${x}px`
+    stick.style.top = `${y}px`
+    stick.classList.add('on')
+    knob.style.transform = 'translate(0px, 0px)'
+    if (hint) hint.style.display = 'none'
   }
 
-  bindStick(moveStick, 52, (x, y) => {
-    state.strafe = x
-    state.forward = -y
-  }, () => {
+  function moveStick(x, y) {
+    let dx = x - originX
+    let dy = y - originY
+    const length = Math.hypot(dx, dy)
+    if (length > RADIUS) {
+      dx = (dx / length) * RADIUS
+      dy = (dy / length) * RADIUS
+    }
+    knob.style.transform = `translate(${dx}px, ${dy}px)`
+    const nx = dx / RADIUS
+    const ny = dy / RADIUS
+    state.strafe = Math.abs(nx) > DEAD_ZONE ? nx : 0
+    state.forward = Math.abs(ny) > DEAD_ZONE ? -ny : 0
+  }
+
+  function dropStick() {
+    movePointer = null
     state.forward = 0
     state.strafe = 0
+    stick.classList.remove('on')
+    knob.style.transform = 'translate(0px, 0px)'
+  }
+
+  window.addEventListener('pointerdown', (event) => {
+    touched = true
+    if (!ios) immersive()
+    if (onControl(event.target)) return
+    const left = event.clientX < window.innerWidth / 2
+    if (left && movePointer === null) {
+      movePointer = event.pointerId
+      placeStick(event.clientX, event.clientY)
+      return
+    }
+    if (!left && dragPointer === null) {
+      dragPointer = event.pointerId
+      lastX = event.clientX
+      lastY = event.clientY
+    }
   })
 
-  bindStick(lookStick, 46, (x, y) => {
-    rate.x = x * STICK_SPEED
-    rate.y = y * STICK_SPEED
-  }, () => {
-    rate.x = 0
-    rate.y = 0
+  window.addEventListener('pointermove', (event) => {
+    if (event.pointerId === movePointer) {
+      moveStick(event.clientX, event.clientY)
+      return
+    }
+    if (event.pointerId !== dragPointer) return
+    drag.dx += (event.clientX - lastX) * DRAG_SPEED
+    drag.dy += (event.clientY - lastY) * DRAG_SPEED
+    lastX = event.clientX
+    lastY = event.clientY
   })
+
+  const release = (event) => {
+    if (event.pointerId === movePointer) dropStick()
+    if (event.pointerId === dragPointer) dragPointer = null
+  }
+  window.addEventListener('pointerup', release)
+  window.addEventListener('pointercancel', release)
 
   jump.addEventListener('pointerdown', (event) => {
     event.preventDefault()
-    try { jump.setPointerCapture(event.pointerId) } catch (error) { void error }
     touched = true
     state.jump = true
     jump.classList.add('on')
@@ -130,6 +147,11 @@ export function createTouchInput() {
     }
   }
 
+  function updateFullLabel(ok) {
+    if (ios) return
+    full.textContent = ok ? 'SAIR DA TELA CHEIA' : 'SEM TELA CHEIA'
+  }
+
   let attempts = 0
   async function immersive() {
     if (attempts >= 3 || document.fullscreenElement) return
@@ -140,11 +162,6 @@ export function createTouchInput() {
       await lockLandscape()
     }
     updateFullLabel(ok)
-  }
-
-  function updateFullLabel(ok) {
-    if (ios) return
-    full.textContent = ok ? 'SAIR DA TELA CHEIA' : 'SEM TELA CHEIA'
   }
 
   full.addEventListener('pointerdown', async (event) => {
@@ -164,30 +181,6 @@ export function createTouchInput() {
     if (ok) await lockLandscape()
     updateFullLabel(ok)
   })
-
-  window.addEventListener('pointerdown', (event) => {
-    touched = true
-    if (!ios) immersive()
-    if (dragId !== null) return
-    if (event.target instanceof Element && event.target.closest('#touch')) return
-    dragId = event.pointerId
-    lastX = event.clientX
-    lastY = event.clientY
-  })
-
-  window.addEventListener('pointermove', (event) => {
-    if (event.pointerId !== dragId) return
-    drag.dx += (event.clientX - lastX) * DRAG_SPEED
-    drag.dy += (event.clientY - lastY) * DRAG_SPEED
-    lastX = event.clientX
-    lastY = event.clientY
-  })
-
-  const endDrag = (event) => {
-    if (event.pointerId === dragId) dragId = null
-  }
-  window.addEventListener('pointerup', endDrag)
-  window.addEventListener('pointercancel', endDrag)
 
   const syncOrientation = () => {
     document.body.classList.toggle('portrait', window.matchMedia('(orientation: portrait)').matches)

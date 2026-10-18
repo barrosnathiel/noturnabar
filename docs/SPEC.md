@@ -88,8 +88,9 @@ Treliça: uma sobre o palco (X 11 a 20, Y 9) e duas sobre a pista (X -2 e X 5, Y
 
 - Detecção por `navigator.maxTouchPoints > 0` e `(pointer: coarse)`. Só aí o `body` ganha a classe `touch` e os controles aparecem.
 - Joystick analógico: a magnitude do deslocamento vira `input.scale`, que multiplica a velocidade, então dá para andar devagar. Zona morta de 0.14.
-- Dois joysticks: o esquerdo anda, o direito gira. O direito guarda uma velocidade angular (`rate`, rad/s) aplicada por frame, por isso `controls.sample` recebe o `dt`.
-- Olhar: qualquer arraste que não comece dentro de `#touch`. Convive com o joystick direito de propósito — joystick para giro contínuo, arraste para mira rápida. O handler checa `event.target instanceof Element` antes do `closest`, senão um evento cujo alvo não é elemento derruba o listener.
+- A tela é dividida ao meio. Toque na metade esquerda faz o joystick aparecer sob o dedo e anda; arraste na metade direita olha. Nenhum controle de movimento tem posição fixa: joystick fixo obriga o polegar a procurar o círculo.
+- A magnitude do deslocamento do joystick vira `input.scale`, que multiplica a velocidade.
+- `controls.sample` recebe o `dt` por causa de `rate`, que hoje fica zerado; era do joystick de olhar, removido a pedido. O handler checa `event.target instanceof Element` antes do `closest`, senão um evento cujo alvo não é elemento derruba o listener.
 - Sem pointer lock no toque: o clique no canvas só pede a trava quando não é celular.
 - Corrida é alternada por toque, não segurada: o polegar direito está ocupado olhando.
 - Orientação: classe `portrait` no `body` sincronizada no resize e no orientationchange; em retrato a tela de aviso cobre o jogo. Travar a orientação só funciona dentro de tela cheia, daí o botão.

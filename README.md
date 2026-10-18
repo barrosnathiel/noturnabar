@@ -34,9 +34,8 @@ Funciona em paisagem. Em retrato a tela pede para girar o aparelho.
 
 | Controle | Ação |
 |---|---|
-| Joystick à esquerda | andar |
-| Joystick à direita | girar a câmera, em velocidade constante |
-| Arrastar na tela | olhar, para mira rápida |
+| Encostar na metade esquerda | o joystick nasce debaixo do dedo e você anda |
+| Arrastar na metade direita | olhar |
 | PULO | pular |
 | CORRER | liga e desliga a corrida |
 | TELA CHEIA | entra em tela cheia e trava a orientação |
