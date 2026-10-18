@@ -28,7 +28,7 @@ Abre em http://localhost:3490.
 | Shift | correr |
 | Espaço | pular |
 | 1, 2, 3 | dançar: balanço, mãos pro alto, solto |
-| Botão direito | menu de dança em volta da mira |
+| Botão direito, ou Control+clique | menu de dança em volta da mira |
 
 ## No celular
 

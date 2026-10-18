@@ -7,6 +7,8 @@ export function createAcoes(touch) {
   const pills = [...document.querySelectorAll('#barra .pill')]
   let atual = 'nada'
   let aberta = false
+  let fixa = false
+  let abertaEm = 0
   let alvo = 'nada'
   let dx = 0
   let dy = 0
@@ -30,6 +32,8 @@ export function createAcoes(touch) {
 
   function abrir() {
     aberta = true
+    fixa = false
+    abertaEm = performance.now()
     dx = 0
     dy = 0
     alvo = atual
@@ -40,6 +44,7 @@ export function createAcoes(touch) {
   function fechar(aplicar) {
     if (!aberta) return
     aberta = false
+    fixa = false
     document.body.classList.remove('roda')
     if (aplicar) {
       atual = alvo
@@ -49,14 +54,26 @@ export function createAcoes(touch) {
 
   window.addEventListener('contextmenu', (evento) => evento.preventDefault())
 
+  const chamaMenu = (evento) =>
+    evento.button === 2 || (evento.button === 0 && (evento.ctrlKey || evento.metaKey))
+
   window.addEventListener('mousedown', (evento) => {
-    if (evento.button !== 2) return
+    if (aberta && fixa) {
+      evento.preventDefault()
+      fechar(true)
+      return
+    }
+    if (!chamaMenu(evento)) return
     evento.preventDefault()
     abrir()
   })
 
   window.addEventListener('mouseup', (evento) => {
-    if (evento.button !== 2) return
+    if (!aberta || fixa) return
+    if (performance.now() - abertaEm < 260) {
+      fixa = true
+      return
+    }
     fechar(true)
   })
 
@@ -70,7 +87,11 @@ export function createAcoes(touch) {
   window.addEventListener('keydown', (evento) => {
     const indice = ['Digit1', 'Digit2', 'Digit3'].indexOf(evento.code)
     if (indice >= 0) definir(ESTILOS[indice])
-    if (evento.code === 'Digit0' || evento.code === 'Escape') {
+    if (evento.code === 'Escape' && aberta) {
+      fechar(false)
+      return
+    }
+    if (evento.code === 'Digit0') {
       atual = 'nada'
       marcar()
     }

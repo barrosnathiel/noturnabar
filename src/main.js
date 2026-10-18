@@ -61,6 +61,7 @@ const player = createPlayer(world, new THREE.Vector3(-18, 0, 0))
 const touch = createTouchInput()
 const controls = createControls(camera, renderer.domElement, touch)
 const acoes = createAcoes(touch)
+controls.bloquearOlhar(acoes.aberta)
 const hud = createHud()
 
 controls.onLockChange((locked) => {

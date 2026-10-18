@@ -12,11 +12,12 @@ export function createControls(camera, canvas, touch) {
   let locked = false
   const listeners = []
   const failures = []
+  let bloqueio = () => false
 
   camera.rotation.order = 'YXZ'
 
   const onMouseMove = (event) => {
-    if (!locked) return
+    if (!locked || bloqueio()) return
     yaw -= event.movementX * 0.0022
     pitch -= event.movementY * 0.0022
     pitch = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, pitch))
@@ -96,6 +97,7 @@ export function createControls(camera, canvas, touch) {
     sample,
     apply,
     setAngles,
+    bloquearOlhar: (fn) => { bloqueio = fn },
     forward,
     right,
     isLocked: () => locked || (touch.supported && touch.engaged()),
