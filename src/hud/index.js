@@ -38,5 +38,13 @@ export function createHud() {
     soundEl.style.display = show ? 'block' : 'none'
   }
 
-  return { tick, dismissHelp, notice, soundState }
+  const salaEl = document.getElementById('sala')
+
+  function sala(texto) {
+    if (!salaEl) return
+    salaEl.textContent = texto
+    salaEl.style.display = 'block'
+  }
+
+  return { tick, dismissHelp, notice, soundState, sala }
 }

@@ -123,6 +123,17 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - Intensidade em unidades físicas (iluminância cai com o quadrado da distância): spot do palco 2600, ponto de serviço na casa dos 350 a 420, bar 42. Mexer nesses números sem considerar `distance` e `decay` apaga ou estoura a cena.
 - `FogExp2` com densidade 0.012, cor igual ao fundo
 
+## Sala
+
+Front estático na Vercel, sala num processo Node no Render. No plano gratuito o Render hiberna depois de ~15 minutos sem tráfego, então a primeira conexão demora a acordar; é por isso que o front não mora lá.
+
+- `server/index.js`: WebSocket sobre um http que responde em `/` e `/saude`. O Render só considera o serviço no ar se houver porta HTTP viva.
+- Ao conectar, o servidor atribui id e sorteia o avatar; o cliente não escolhe. Também manda a lista de quem já estava na casa.
+- O cliente envia a própria posição no máximo 15 vezes por segundo; o servidor rebate o estado na mesma cadência, sempre sem o registro do próprio destinatário — por isso ninguém vê o próprio avatar.
+- `crowd.place` guarda a posição alvo e `crowd.update` interpola até lá, senão o movimento sairia aos pulos de pacote em pacote.
+- Posição com número não finito é descartada no servidor, quem fica 20 segundos sem mandar nada é desconectado, e a sala para em 40 pessoas.
+- `src/net/sala.js` tem a constante `PADRAO` com a URL do servidor; `?sala=ws://...` sobrescreve para testar local. Com a constante vazia o jogo roda sozinho, sem rede.
+
 ## Avatares
 
 - `actors/avatar.js` monta os dois tipos com primitivas e devolve `root` mais um `update(dt, speed)`. Geometrias e materiais ficam em cache por tipo, então o segundo ET não recria nada.

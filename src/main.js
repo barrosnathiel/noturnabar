@@ -10,6 +10,7 @@ import { createTouchInput } from './player/touch.js'
 import { createHud } from './hud/index.js'
 import { createVenueSound } from './sound/venue.js'
 import { createCrowd } from './actors/crowd.js'
+import { conectarSala } from './net/sala.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
 const coarse = window.matchMedia('(pointer: coarse)').matches
@@ -49,6 +50,10 @@ const rotas = [
   { id: 'teste-3', kind: 'et', centro: [15.5, 1.2, 0], raio: 2.6, velocidade: 0.6, fase: 4 }
 ]
 if (demo) rotas.forEach((rota) => crowd.spawn(rota.id, rota.kind))
+
+const sala = conectarSala(crowd, (tipo) => {
+  hud.sala(`você é o ${tipo}`)
+})
 
 const world = createCollisionWorld(colliders)
 const player = createPlayer(world, new THREE.Vector3(-18, 0, 0))
@@ -114,6 +119,7 @@ function frame(now = performance.now()) {
       )
     }
   }
+  sala.enviar(player.position, camera.rotation.y)
   crowd.update(dt)
   hud.tick(dt)
   venue.update(camera.position)
@@ -125,7 +131,7 @@ function frame(now = performance.now()) {
 
 frame()
 
-window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd }
+window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd, sala }
 window.stats = () => ({
   drawCalls: renderer.info.render.calls,
   triangles: renderer.info.render.triangles,
