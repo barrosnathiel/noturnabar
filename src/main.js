@@ -50,7 +50,10 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
 
-await renderer.compileAsync(scene, camera)
+const warmUp = renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve()
+warmUp.catch(() => {}).then(() => {
+  renderer.shadowMap.needsUpdate = true
+})
 renderer.shadowMap.needsUpdate = true
 
 let last = performance.now()

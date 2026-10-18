@@ -65,6 +65,35 @@
       </div>
     </div>
     <div id="rotate">vire o celular na horizontal<br />para entrar na casa</div>
+    <script>
+      (function () {
+        var mostrado = false;
+        function avisar(texto) {
+          if (mostrado) return;
+          mostrado = true;
+          var ajuda = document.getElementById('help');
+          var girar = document.getElementById('rotate');
+          if (girar) girar.style.display = 'none';
+          if (!ajuda) return;
+          ajuda.className = '';
+          ajuda.innerHTML = '<div class="t">NAO CARREGOU</div>' + String(texto).slice(0, 240);
+        }
+        window.addEventListener('error', function (evento) {
+          if (evento && evento.target && evento.target.src) {
+            avisar('nao carregou o arquivo ' + evento.target.src);
+            return;
+          }
+          avisar((evento && evento.message) || 'erro ao carregar o jogo');
+        }, true);
+        window.addEventListener('unhandledrejection', function (evento) {
+          var motivo = evento && evento.reason;
+          avisar((motivo && motivo.message) || String(motivo));
+        });
+        setTimeout(function () {
+          if (!window.game) avisar('o jogo nao iniciou em 8 segundos. navegador: ' + navigator.userAgent);
+        }, 8000);
+      })();
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
