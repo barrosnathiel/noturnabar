@@ -2,6 +2,8 @@
 
 Casa de show 3D em primeira pessoa que roda no navegador. Um galpão fechado de 40x25m com palco, pista rebaixada, mezanino em U, bar e hall, para andar livremente. Toda a geometria é gerada em código, sem nenhum asset externo.
 
+Está no ar em **https://barrosnathiel.github.io/noturnabar/** — publicado automaticamente a cada push na `main`.
+
 ## Rodando
 
 ```
