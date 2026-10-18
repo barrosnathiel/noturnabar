@@ -134,6 +134,12 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 
 Variação de cor é feita por luz, não por textura.
 
+## Publicação
+
+O build sai com `base: './'`. A Vercel serve na raiz do domínio e o GitHub Pages serve em `/noturnabar/`: com base absoluta, um dos dois sempre pede o bundle no caminho errado e recebe 404, e a tela fica parada na entrada sem dizer nada. Caminho relativo serve os dois com o mesmo artefato.
+
+Um script inline no `index.html`, antes do módulo, escreve na tela qualquer erro de execução, promessa rejeitada ou arquivo que não baixou, e avisa se o jogo não iniciar em 8 segundos. Ele é a única forma de enxergar falha no celular de outra pessoa, então não remover.
+
 ## Performance
 Alvo: 60fps, e nunca abaixo de 45 olhando o galpão inteiro do mezanino.
 
