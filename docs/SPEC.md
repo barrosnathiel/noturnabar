@@ -141,7 +141,8 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - A animação é um ciclo de caminhada simples: pernas e braços oscilam em torno dos pivôs com amplitude proporcional à velocidade, mais um sobe-e-desce do tronco. Com velocidade zero ele para em pé.
 - O ET tem passo longo e o porco passo curto (`stride` em cada skin), que é o que faz os dois andarem diferente sem animação própria.
 - `actors/crowd.js` guarda quem está na sala, interpola posição e ângulo entre as atualizações que chegam da rede e aplica o `update` de cada um. É ele que a camada de rede vai alimentar.
-- Custo: cerca de 4 a 5 draw calls por avatar. O teto de 150 vale para a casa vazia; com 40 pessoas isso passa de 190 e aí será preciso instanciar os membros ou simplificar quem está longe. Até umas 20 pessoas não há o que fazer.
+- Cada avatar são 7 meshes, um por material móvel: tronco, cabeça, rosto, duas pernas e dois braços. As partes que não se movem entre si são mergeadas dentro de cada um desses, por isso o detalhe subiu sem multiplicar draw call.
+- Custo medido: 7 draw calls e cerca de 2.400 triângulos por avatar. O teto de 150 vale para a casa vazia (30); com 15 pessoas fica em 135, com 40 passa de 300. A saída, quando encher, é um `InstancedMesh` por parte e por tipo, o que deixaria o custo fixo em 7 por tipo em vez de 7 por pessoa.
 - `?teste=1` na URL liga três avatares de demonstração circulando pela casa, sem rede nenhuma.
 
 ## Telão e som
