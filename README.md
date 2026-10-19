@@ -51,6 +51,8 @@ O jogo nasce num lobby com dois portais: a casa de show e a arena. Atravessar tr
 
 Para entrar direto num lugar: `?lugar=arena` ou `?lugar=casa`.
 
+Para encher a pista de figurantes dançando: `?multidao=500` (vai até 800). Eles são locais, só seus — ninguém mais vê.
+
 ## Multiplayer
 
 Quem entra ganha um avatar sorteado entre um ET e um porco, e vê os outros andando pela casa. A sala é um servidor Node com WebSocket em `server/`, publicado em https://noturnabar.onrender.com — ele hiberna sem tráfego, então a primeira conexão depois de um tempo parado leva até um minuto para acordar.

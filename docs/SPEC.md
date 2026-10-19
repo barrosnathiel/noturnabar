@@ -144,6 +144,7 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - Ao descartar, as geometrias são liberadas e os elementos DOM dos `CSS3DObject` removidos à mão; sem isso o iframe do telão fica órfão no documento.
 - Portal é uma `Box3`. Ao entrar num mundo o jogador fica imune até sair de qualquer caixa de portal, senão ele renasce dentro do portal de volta e pinga entre os dois mundos.
 - `?lugar=arena` entra direto, útil para desenvolver sem atravessar o lobby.
+- `?multidao=N` enche a pista com N figurantes dançando, até 800. São locais, não entram na rede, e são repovoados a cada troca de mundo — a ordem importa: `crowd.limpar()` vem antes, senão apaga quem acabou de nascer.
 
 ## Sala
 
@@ -174,6 +175,7 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - `actors/crowd.js` guarda quem está na sala, interpola posição e ângulo entre as atualizações que chegam da rede e aplica o `update` de cada um. É ele que a camada de rede vai alimentar.
 - Braço e perna têm dois segmentos cada, com uma esfera centrada no pivô da dobra. É ela que fecha a junta quando o cotovelo e o joelho dobram; sem a esfera abre fresta e o membro lê como duas peças encaixadas.
 - Tentei antes uma malha única com esqueleto (`SkinnedMesh`) e ficou pior: o corpo é um conjunto de peças sobrepostas, e ao deformar cada peça entorta por conta própria e elas se atravessam. Skinning aqui só valeria com uma casca contínua de verdade; `actors/corpo.js` guarda os helpers de geometria que sobraram dessa tentativa.
+- Medição de carga: 500 figurantes dançando na arena deram 60fps, 1.625 draw calls e 1,4 milhão de triângulos, sem nenhum quadro perdido, num M5. A curva é linear e não houve degrau: 25, 50, 100, 200, 350 e 500 renderizaram todos a 60. O limite prático é outro, de rede e de celular, não de renderização no desktop.
 - Custo medido: cerca de 6 draw calls por avatar. O teto de 150 vale para a casa vazia (30); com 20 pessoas fica em 150. A saída, quando encher, é `InstancedMesh` por parte e por tipo.
 - Acionamento em `player/acoes.js`: botão direito segurado abre um menu em volta da mira e a direção do mouse escolhe; teclas 1, 2 e 3 ligam e desligam direto; no celular é a barra de pílulas na base. O `contextmenu` do navegador é bloqueado, senão o menu do sistema abre por cima do jogo. No Mac, Control+clique não chega como botão direito: vem botão 0 com `ctrlKey`, então o menu aceita as duas formas.
 

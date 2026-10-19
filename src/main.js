@@ -95,6 +95,33 @@ const sala = conectarSala(crowd, (tipo) => {
   vestir(tipo)
 })
 
+const FIGURANTES = Math.min(
+  parseInt(new URLSearchParams(location.search).get('multidao') || '0', 10) || 0,
+  800
+)
+const ESTILOS = ['balanco', 'maos', 'solto']
+
+function encherPista(nome) {
+  if (!FIGURANTES) return
+  const perto = nome === 'arena' ? 6 : 3
+  const longe = nome === 'arena' ? 44 : 11
+  const centro = nome === 'arena' ? -22 : 2
+  for (let i = 0; i < FIGURANTES; i++) {
+    const id = `figurante-${i}`
+    crowd.spawn(id, i % 2 ? 'et' : 'porco')
+    const a = Math.random() * Math.PI * 2
+    const r = perto + Math.random() * (longe - perto)
+    crowd.place(
+      id,
+      centro + Math.cos(a) * r,
+      0,
+      Math.sin(a) * r,
+      Math.random() * Math.PI * 2,
+      ESTILOS[i % ESTILOS.length]
+    )
+  }
+}
+
 let atual = null
 let venue = createVenueSound(null, [], false)
 let imune = true
@@ -129,6 +156,7 @@ function entrar(nome) {
   imune = true
   hud.sala(meuTipo ? `${receita.titulo} · você é o ${meuTipo}` : receita.titulo)
   crowd.limpar()
+  encherPista(nome)
   renderer.shadowMap.needsUpdate = true
 }
 
