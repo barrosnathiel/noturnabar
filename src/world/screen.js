@@ -32,11 +32,13 @@ export function buildScreen(scene, opcoes = {}) {
   container.style.width = `${PIXELS}px`
   container.style.height = `${(PIXELS * HEIGHT) / WIDTH}px`
   container.style.background = '#000'
+  container.style.pointerEvents = 'none'
 
   const iframe = document.createElement('iframe')
   iframe.style.width = '100%'
   iframe.style.height = '100%'
   iframe.style.border = '0'
+  iframe.style.pointerEvents = 'none'
   iframe.allow = 'autoplay; encrypted-media; picture-in-picture'
   iframe.src =
     `https://www.youtube.com/embed/${VIDEO_ID}` +

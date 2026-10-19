@@ -32,6 +32,7 @@ export function sincronizarTelas(mestre, telas = []) {
     const base = mestre.tempo()
     if (!Number.isFinite(base) || base <= 0) return
     try {
+      if (jogador.getPlayerState() !== 1) jogador.playVideo()
       const diferenca = jogador.getCurrentTime() - base
       if (forcar || Math.abs(diferenca) > TOLERANCIA) {
         jogador.seekTo(base + 0.1, true)
@@ -68,6 +69,15 @@ export function sincronizarTelas(mestre, telas = []) {
   })
 
   return {
+    estados() {
+      return jogadores.map((jogador) => {
+        try {
+          return jogador.getPlayerState()
+        } catch (erro) {
+          return -99
+        }
+      })
+    },
     tempos() {
       return jogadores.map((jogador) => {
         try {
