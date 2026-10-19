@@ -299,6 +299,156 @@ async function sobrevoar(grupo, voadores) {
   }
 }
 
+function texturaLua() {
+  const tela = document.createElement('canvas')
+  tela.width = 256
+  tela.height = 128
+  const ctx = tela.getContext('2d')
+  ctx.fillStyle = '#767d8c'
+  ctx.fillRect(0, 0, 256, 128)
+  let semente = 31
+  const sorte = () => {
+    semente = (semente * 1103515245 + 12345) % 2147483648
+    return semente / 2147483648
+  }
+  for (let i = 0; i < 90; i++) {
+    const r = 2 + sorte() * 11
+    const x = sorte() * 256
+    const y = sorte() * 128
+    const tom = 84 + Math.floor(sorte() * 38)
+    ctx.beginPath()
+    ctx.fillStyle = `rgb(${tom},${tom + 4},${tom + 12})`
+    ctx.arc(x, y, r, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  return new THREE.CanvasTexture(tela)
+}
+
+function pintarTexto(tela) {
+  const ctx = tela.getContext('2d')
+  ctx.clearRect(0, 0, tela.width, tela.height)
+  ctx.font = '300px Pacifico, "Snell Roundhand", "Brush Script MT", cursive'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.shadowColor = '#ff0620'
+  ctx.shadowBlur = 90
+  ctx.fillStyle = '#ff2c3e'
+  ctx.save()
+  ctx.translate(tela.width / 2, tela.height / 2)
+  ctx.rotate(-0.07)
+  for (let i = 0; i < 5; i++) ctx.fillText('Rock in Rio', 0, 0)
+  ctx.restore()
+}
+
+const TRACO_GUITARRA =
+  'M465 7c-9.4-9.4-24.6-9.4-33.9 0L383 55c-2.4 2.4-4.3 5.3-5.5 8.5l-15.4 41-77.5 77.6c-45.1-29.4-99.3-30.2-131 1.6c-11 11-18 24.6-21.4 39.6c-3.7 16.6-19.1 30.7-36.1 31.6c-25.6 1.3-49.3 10.7-67.3 28.6C-16 328.4-7.6 409.4 47.5 464.5s136.1 63.5 180.9 18.7c17.9-17.9 27.4-41.7 28.6-67.3c.9-17 15-32.3 31.6-36.1c15-3.4 28.6-10.5 39.6-21.4c31.8-31.8 31-85.9 1.6-131l77.6-77.6 41-15.4c3.2-1.2 6.1-3.1 8.5-5.5l48-48c9.4-9.4 9.4-24.6 0-33.9L465 7zM208 256a48 48 0 1 1 0 96 48 48 0 1 1 0-96z'
+
+function pintarGuitarra(tela) {
+  const ctx = tela.getContext('2d')
+  ctx.clearRect(0, 0, tela.width, tela.height)
+  const traco = new Path2D(TRACO_GUITARRA)
+  const escala = (tela.width / 512) * 0.88
+  ctx.save()
+  ctx.translate(tela.width / 2, tela.height / 2)
+  ctx.scale(escala, escala)
+  ctx.translate(-256, -256)
+  ctx.fillStyle = '#ffffff'
+  ctx.shadowColor = 'rgba(8,12,20,0.8)'
+  ctx.shadowBlur = 26
+  ctx.fill(traco)
+  ctx.shadowBlur = 0
+  ctx.fill(traco)
+  ctx.restore()
+}
+
+function letreiro(grupo) {
+  const telaTexto = document.createElement('canvas')
+  telaTexto.width = 2048
+  telaTexto.height = 512
+  pintarTexto(telaTexto)
+  const mapaTexto = new THREE.CanvasTexture(telaTexto)
+  if (document.fonts && document.fonts.load) {
+    document.fonts
+      .load('300px Pacifico')
+      .then(() => {
+        pintarTexto(telaTexto)
+        mapaTexto.needsUpdate = true
+      })
+      .catch(() => {})
+  }
+
+  const texto = new THREE.Mesh(
+    new THREE.PlaneGeometry(38, 9.5),
+    new THREE.MeshBasicMaterial({
+      map: mapaTexto,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+      fog: false
+    })
+  )
+  texto.position.y = 12.5
+  texto.frustumCulled = false
+
+  const lua = new THREE.Mesh(
+    new THREE.SphereGeometry(7, 34, 24),
+    new THREE.MeshStandardMaterial({
+      map: texturaLua(),
+      roughness: 1,
+      metalness: 0,
+      emissive: 0xffffff,
+      emissiveIntensity: 0.22,
+      fog: false
+    })
+  )
+  lua.material.emissiveMap = lua.material.map
+  lua.position.z = -5.5
+  lua.frustumCulled = false
+
+  const telaGuitarra = document.createElement('canvas')
+  telaGuitarra.width = 512
+  telaGuitarra.height = 512
+  pintarGuitarra(telaGuitarra)
+  const guitarra = new THREE.Mesh(
+    new THREE.PlaneGeometry(13.6, 13.6),
+    new THREE.MeshBasicMaterial({
+      map: new THREE.CanvasTexture(telaGuitarra),
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      fog: false
+    })
+  )
+  guitarra.position.set(0, -0.3, 1.8)
+  guitarra.frustumCulled = false
+
+  const tombo = new THREE.Group()
+  tombo.add(texto)
+  tombo.add(lua)
+  tombo.add(guitarra)
+  tombo.rotation.x = 0
+
+  const quadro = new THREE.Group()
+  quadro.add(tombo)
+  quadro.position.set(33.6, 37, 0)
+  quadro.scale.setScalar(1.05)
+  quadro.rotation.y = -Math.PI / 2
+  grupo.add(quadro)
+
+  const neon = new THREE.PointLight(0xff1a38, 900, 54, 1.9)
+  neon.position.set(30, 44, 0)
+  grupo.add(neon)
+
+  let tempo = 0
+  return (dt) => {
+    tempo += dt
+    lua.rotation.y += dt * 0.05
+    texto.material.opacity = 0.88 + Math.sin(tempo * 1.6) * 0.12
+    neon.intensity = 820 + Math.sin(tempo * 1.6) * 180
+  }
+}
+
 let brilhoMotor = null
 function brilho() {
   if (brilhoMotor) return brilhoMotor
@@ -455,11 +605,13 @@ export const arena = {
     sobrevoar(grupo, voadores)
     const frota = []
     levantarFrota(grupo, frota)
+    const girarLua = letreiro(grupo)
     let relogio = 0
 
     function animar(dt) {
       relogio += dt
       moverCometa(dt)
+      girarLua(dt)
       for (const { nave, rota, chamaMat } of frota) {
         const a = relogio * rota.giro + rota.fase
         nave.position.set(
