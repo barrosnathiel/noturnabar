@@ -12,7 +12,14 @@ export function createSelecao(aoEntrar) {
   const campoNome = document.getElementById('apelido')
   if (campoNome) {
     campoNome.value = nomeSalvo()
-    campoNome.addEventListener('keydown', (evento) => evento.stopPropagation())
+    campoNome.addEventListener('keydown', (evento) => {
+      if (evento.code === 'Escape') {
+        campoNome.blur()
+        return
+      }
+      evento.stopPropagation()
+      if (evento.code === 'Enter' || evento.code === 'NumpadEnter') confirmar()
+    })
   }
 
   let indice = 0

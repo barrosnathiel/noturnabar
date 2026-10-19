@@ -30,6 +30,9 @@ export function createAcesso(aoMudar) {
 
   function fechar() {
     painel.classList.remove('visivel')
+    if (document.activeElement && painel.contains(document.activeElement)) {
+      document.activeElement.blur()
+    }
   }
 
   async function confirmar() {
@@ -71,6 +74,11 @@ export function createAcesso(aoMudar) {
   botao.addEventListener('click', confirmar)
   for (const campo of [campoEmail, campoSenha]) {
     campo.addEventListener('keydown', (evento) => {
+      if (evento.code === 'Escape') {
+        campo.blur()
+        fechar()
+        return
+      }
       evento.stopPropagation()
       if (evento.code === 'Enter' || evento.code === 'NumpadEnter') confirmar()
     })
@@ -79,5 +87,5 @@ export function createAcesso(aoMudar) {
   marcar()
   mostrarChip()
 
-  return { conta: sessao, atualizar: mostrarChip }
+  return { conta: sessao, atualizar: mostrarChip, fechar }
 }

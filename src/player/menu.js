@@ -57,11 +57,15 @@ export function createMenu(aoTrocarCamera, aoVoltar) {
     })
   }
 
-  window.addEventListener('keydown', (evento) => {
-    if (evento.code !== 'Escape' || !aberto) return
-    evento.preventDefault()
-    retomar()
-  })
+  window.addEventListener(
+    'keydown',
+    (evento) => {
+      if (evento.code !== 'Escape' || !aberto) return
+      evento.preventDefault()
+      retomar()
+    },
+    true
+  )
   if (abrirBotao) {
     abrirBotao.addEventListener('pointerdown', (evento) => {
       evento.preventDefault()
