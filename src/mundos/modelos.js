@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { clone as clonarEsqueleto } from 'three/examples/jsm/utils/SkeletonUtils.js'
 
 const loader = new GLTFLoader()
 const cache = new Map()
@@ -71,6 +72,44 @@ export function carregar(nome) {
   })
   cache.set(nome, promessa)
   return promessa
+}
+
+const animados = new Map()
+
+export function carregarAnimado(nome) {
+  if (animados.has(nome)) return animados.get(nome)
+  const promessa = new Promise((resolve) => {
+    loader.load(
+      `modelos/${nome}.gltf`,
+      (gltf) => {
+        gltf.scene.traverse((no) => {
+          if (!no.isMesh && !no.isSkinnedMesh) return
+          no.material = ajustar(no.material)
+          no.frustumCulled = false
+          no.castShadow = false
+          no.receiveShadow = false
+        })
+        resolve({ cena: gltf.scene, animacoes: gltf.animations || [] })
+      },
+      undefined,
+      () => resolve(null)
+    )
+  })
+  animados.set(nome, promessa)
+  return promessa
+}
+
+export function instanciarAnimado(modelo, nomeAnimacao) {
+  const copia = clonarEsqueleto(modelo.cena)
+  const mixer = new THREE.AnimationMixer(copia)
+  const trilha =
+    modelo.animacoes.find((a) => a.name === nomeAnimacao) || modelo.animacoes[0]
+  if (trilha) {
+    const acao = mixer.clipAction(trilha)
+    acao.timeScale = 0.7 + Math.random() * 0.5
+    acao.play()
+  }
+  return { objeto: copia, mixer }
 }
 
 export function espalhar(partes, lugares, materialForcado) {

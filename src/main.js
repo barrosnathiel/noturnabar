@@ -216,6 +216,7 @@ function frame(now = performance.now()) {
 
   if (input.forward !== 0 || input.strafe !== 0 || input.jump) acoes.andou()
   sala.enviar(player.position, camera.rotation.y, acoes.atual(), atual.nome)
+  if (atual.mundo.animar) atual.mundo.animar(dt)
   crowd.update(dt)
   hud.tick(dt)
   venue.update(camera.position)

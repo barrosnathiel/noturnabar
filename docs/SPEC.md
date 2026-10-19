@@ -131,6 +131,8 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - As referências que sobram no `.gltf` precisam apontar para os arquivos que existem, senão o carregador pede os PNGs e enche o console de 404.
 - `mundos/modelos.js` funde a malha **por material**, não numa só: mergear tudo perderia qual textura vai em qual parte. Cada grupo vira um `InstancedMesh`, então dezenas de caixotes custam um draw call por material.
 - O atributo `uv` precisa sobreviver ao merge. Eu descartava todos os atributos menos posição e normal, e sem uv a textura não aparece em lugar nenhum.
+- Modelo com animação segue outro caminho: `carregarAnimado` não funde nada, porque fundir a malha destrói o esqueleto e com ele a animação. Cada cópia sai de `SkeletonUtils.clone`, que duplica a hierarquia de ossos, e ganha o próprio `AnimationMixer`. Por isso os drones custam draw calls por unidade, ao contrário dos caixotes.
+- O mundo pode expor `animar(dt)`, chamado pelo loop. É assim que os mixers dos drones avançam.
 - O carregamento é assíncrono e o mundo é construído de forma síncrona: os adereços entram quando chegam, e a função confere se o grupo ainda está na cena antes de adicionar, senão enfeita um mundo que o jogador já deixou.
 
 ## Mundos

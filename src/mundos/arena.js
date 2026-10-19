@@ -3,7 +3,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { createBuilder } from '../world/builder.js'
 import { materials as M } from '../world/materials.js'
 import { buildScreen } from '../world/screen.js'
-import { carregar, espalhar } from './modelos.js'
+import { carregar, espalhar, carregarAnimado, instanciarAnimado } from './modelos.js'
 
 const PALCO = { x0: 12, x1: 34, z0: -30, z1: 30, topo: 2.8 }
 const PISTA = { x0: -90, x1: 34, z0: -55, z1: 55 }
@@ -124,6 +124,24 @@ async function adornar(grupo) {
   }
 }
 
+const ROTAS_DRONE = [
+  { raio: 26, altura: 15, giro: 0.16, fase: 0, sobe: 1.6, anim: 'Idle' },
+  { raio: 40, altura: 21, giro: -0.11, fase: 2.1, sobe: 2.2, anim: 'Look' },
+  { raio: 15, altura: 11, giro: 0.24, fase: 4.3, sobe: 1.1, anim: 'Idle' },
+  { raio: 52, altura: 26, giro: -0.08, fase: 5.6, sobe: 2.8, anim: 'Look' }
+]
+
+async function sobrevoar(grupo, voadores) {
+  const modelo = await carregarAnimado('Enemy_EyeDrone')
+  if (!modelo || !grupo.parent) return
+  for (const rota of ROTAS_DRONE) {
+    const { objeto, mixer } = instanciarAnimado(modelo, rota.anim)
+    objeto.scale.setScalar(2.4)
+    grupo.add(objeto)
+    voadores.push({ objeto, mixer, rota })
+  }
+}
+
 export const arena = {
   nome: 'arena',
   titulo: 'arena',
@@ -200,6 +218,24 @@ export const arena = {
 
     skyline(grupo)
     adornar(grupo)
+    const voadores = []
+    sobrevoar(grupo, voadores)
+    let relogio = 0
+
+    function animar(dt) {
+      relogio += dt
+      for (const { objeto, mixer, rota } of voadores) {
+        mixer.update(dt)
+        const a = relogio * rota.giro + rota.fase
+        objeto.position.set(
+          -22 + Math.cos(a) * rota.raio,
+          rota.altura + Math.sin(relogio * 0.6 + rota.fase) * rota.sobe,
+          Math.sin(a) * rota.raio
+        )
+        objeto.rotation.y = -a + Math.PI / 2
+        objeto.rotation.z = Math.sin(relogio * 0.8 + rota.fase) * 0.09
+      }
+    }
 
     for (let i = 0; i < 5; i++) {
       const x = -78 + i * 26
@@ -229,6 +265,7 @@ export const arena = {
       grupo,
       colliders,
       telao,
+      animar,
       spawn: new THREE.Vector3(-70, 0, 0),
       olhar: -Math.PI / 2,
       portais: [
