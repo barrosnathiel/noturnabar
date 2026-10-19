@@ -144,6 +144,8 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - Ao descartar, as geometrias são liberadas e os elementos DOM dos `CSS3DObject` removidos à mão; sem isso o iframe do telão fica órfão no documento.
 - Portal é uma `Box3`. Ao entrar num mundo o jogador fica imune até sair de qualquer caixa de portal, senão ele renasce dentro do portal de volta e pinga entre os dois mundos.
 - `?lugar=arena` entra direto, útil para desenvolver sem atravessar o lobby.
+- O planeta e a lua da arena são esferas com uma luz direcional de lado, que é o que cria a fase. O anel é um `RingGeometry` inclinado e transparente. Ficam a 180m, dentro do `far` da câmera, e com `frustumCulled` desligado para não sumirem em ângulos rasos.
+- Cuidado com nome: a função que monta isso se chama `astros`, não `ceu`, porque já existe uma variável `ceu` na arena para a luz de hemisfério e ela sombreava a função.
 - `?multidao=N` enche a pista com N figurantes dançando, até 800. São locais, não entram na rede, e são repovoados a cada troca de mundo — a ordem importa: `crowd.limpar()` vem antes, senão apaga quem acabou de nascer.
 
 ## Sala

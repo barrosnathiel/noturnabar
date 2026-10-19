@@ -42,6 +42,60 @@ const MAT = {
   baliza: new THREE.MeshBasicMaterial({ color: 0xff5a6e })
 }
 
+function astros(grupo) {
+  const planeta = new THREE.Mesh(
+    new THREE.SphereGeometry(46, 48, 32),
+    new THREE.MeshStandardMaterial({
+      color: 0x9a5f4a,
+      roughness: 1,
+      metalness: 0,
+      emissive: 0x2a1410,
+      emissiveIntensity: 0.6,
+      dithering: true
+    })
+  )
+  planeta.position.set(-150, 96, -142)
+  planeta.rotation.z = 0.4
+  planeta.frustumCulled = false
+  grupo.add(planeta)
+
+  const anel = new THREE.Mesh(
+    new THREE.RingGeometry(58, 84, 96),
+    new THREE.MeshBasicMaterial({
+      color: 0xc79a7e,
+      transparent: true,
+      opacity: 0.26,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      dithering: true
+    })
+  )
+  anel.position.copy(planeta.position)
+  anel.rotation.set(-1.15, 0.3, 0.45)
+  anel.frustumCulled = false
+  grupo.add(anel)
+
+  const sol = new THREE.DirectionalLight(0xffd9b0, 2.2)
+  sol.position.set(40, 120, 60)
+  sol.target.position.copy(planeta.position)
+  grupo.add(sol)
+  grupo.add(sol.target)
+
+  const lua = new THREE.Mesh(
+    new THREE.SphereGeometry(11, 28, 20),
+    new THREE.MeshStandardMaterial({
+      color: 0x8e96a8,
+      roughness: 1,
+      emissive: 0x161a22,
+      emissiveIntensity: 0.8,
+      dithering: true
+    })
+  )
+  lua.position.set(120, 112, -96)
+  lua.frustumCulled = false
+  grupo.add(lua)
+}
+
 function skyline(grupo) {
   const blocos = []
   const balizas = []
@@ -216,6 +270,7 @@ export const arena = {
     pista.position.set(-30, 18, 0)
     grupo.add(pista)
 
+    astros(grupo)
     skyline(grupo)
     adornar(grupo)
     const voadores = []
