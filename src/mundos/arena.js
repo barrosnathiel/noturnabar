@@ -608,19 +608,19 @@ export const arena = {
     const colliders = b.commit(grupo)
 
     const telao = buildScreen(grupo, {
-      largura: 40,
-      altura: 22.5,
-      centro: new THREE.Vector3(33.2, 17, 0),
-      moldura: 1.4,
-      brilho: 1400
+      largura: 48,
+      altura: 27,
+      centro: new THREE.Vector3(33.2, 18.2, 0),
+      moldura: 1.6,
+      brilho: 1700
     })
-    for (const lado of [-22, 22]) {
+    for (const lado of [-29.5, 29.5]) {
       buildScreen(grupo, {
-        largura: 14,
-        altura: 7.9,
-        centro: new THREE.Vector3(33.2, 11, lado),
-        moldura: 0.8,
-        brilho: 320
+        largura: 10,
+        altura: 5.6,
+        centro: new THREE.Vector3(33.2, 9, lado),
+        moldura: 0.7,
+        brilho: 260
       })
     }
 
