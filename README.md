@@ -23,7 +23,7 @@ Abre em http://localhost:3490.
 | Tecla | Ação |
 |---|---|
 | Clique na tela | trava o mouse |
-| ESC | abre o menu e solta o mouse |
+| ESC | abre o menu; com o menu aberto, volta pro jogo |
 | W A S D | andar |
 | Shift | correr |
 | Espaço | pular |

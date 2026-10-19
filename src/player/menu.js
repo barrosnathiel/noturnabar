@@ -42,9 +42,25 @@ export function createMenu(aoTrocarCamera, aoVoltar) {
   for (const botao of botoes) {
     botao.addEventListener('click', () => definir(botao.dataset.cam))
   }
-  voltar.addEventListener('click', () => {
+  function retomar() {
+    if (!aberto) return
     fechar()
     aoVoltar()
+  }
+
+  voltar.addEventListener('click', retomar)
+
+  const fundo = document.getElementById('menu')
+  if (fundo) {
+    fundo.addEventListener('click', (evento) => {
+      if (evento.target === fundo) retomar()
+    })
+  }
+
+  window.addEventListener('keydown', (evento) => {
+    if (evento.code !== 'Escape' || !aberto) return
+    evento.preventDefault()
+    retomar()
   })
   if (abrirBotao) {
     abrirBotao.addEventListener('pointerdown', (evento) => {

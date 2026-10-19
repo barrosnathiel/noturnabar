@@ -166,7 +166,8 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 
 - `player/camera.js` tem os dois modos. Em terceira pessoa a câmera fica 3,4m atrás e 1,52m acima, na direção oposta ao olhar, e encurta quando há parede no caminho: um raio do ombro até a posição desejada contra os mesmos colisores do mundo, com margem de 0,32m. Sem isso a câmera entra na parede e mostra o lado de fora.
 - O jogador ganha o próprio avatar, escondido em primeira pessoa — visível, a cabeça taparia a tela.
-- O menu abre quando o pointer lock cai, que é o que o ESC já faz. Abrir só depois da primeira entrada, senão ele aparece na carga da página. No celular, onde não existe ESC, há um botão MENU no topo.
+- O menu abre quando o pointer lock cai, que é o que o ESC já faz — e também quando o jogador troca de janela com Alt+Tab, porque aí o foco se perde e o navegador solta a trava sozinho. Por isso ESC com o menu aberto retoma o jogo em vez de só fechar: sem isso, quem volta de outra janela fica sem caminho de teclado para dentro.
+- Clicar no fundo escuro do menu também retoma; clicar dentro da caixa não, senão escolher a câmera fecharia o menu junto. Abrir só depois da primeira entrada, senão ele aparece na carga da página. No celular, onde não existe ESC, há um botão MENU no topo.
 - A escolha de câmera fica em `localStorage`; toda leitura e escrita vai em try/catch porque em janela anônima o acesso pode lançar.
 
 ## Avatares
