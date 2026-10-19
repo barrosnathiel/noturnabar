@@ -614,21 +614,6 @@ export const arena = {
       moldura: 1.6,
       brilho: 1700
     })
-    const laterais = []
-    for (const lado of [-22, 22]) {
-      laterais.push(
-        buildScreen(grupo, {
-          largura: 15,
-          altura: 8.4,
-          centro: new THREE.Vector3(31.4, 9.6, lado),
-          moldura: 0.8,
-          brilho: 340,
-          pixels: 426,
-          leve: true
-        })
-      )
-    }
-
     grupo.add(new THREE.AmbientLight(0x1b2234, 0.5))
     const ceu = new THREE.HemisphereLight(0x2a3650, 0x080a12, 0.45)
     grupo.add(ceu)
@@ -715,7 +700,6 @@ export const arena = {
       grupo,
       colliders,
       telao,
-      telas: laterais,
       animar,
       spawn: new THREE.Vector3(-70, 0, 0),
       olhar: -Math.PI / 2,

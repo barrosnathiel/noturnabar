@@ -8,7 +8,6 @@ const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
 const LIGADO = !LOCAL || new URLSearchParams(location.search).has('video')
 
 export function buildScreen(scene, opcoes = {}) {
-  const PIXELS_TELA = opcoes.pixels ?? PIXELS
   const WIDTH = opcoes.largura ?? 16
   const HEIGHT = opcoes.altura ?? 9
   const CENTER = opcoes.centro ?? new THREE.Vector3(19.5, 5.9, 0)
@@ -30,8 +29,8 @@ export function buildScreen(scene, opcoes = {}) {
   scene.add(hole)
 
   const container = document.createElement('div')
-  container.style.width = `${PIXELS_TELA}px`
-  container.style.height = `${(PIXELS_TELA * HEIGHT) / WIDTH}px`
+  container.style.width = `${PIXELS}px`
+  container.style.height = `${(PIXELS * HEIGHT) / WIDTH}px`
   container.style.background = '#000'
   container.style.pointerEvents = 'none'
 
@@ -44,14 +43,13 @@ export function buildScreen(scene, opcoes = {}) {
   iframe.src =
     `https://www.youtube.com/embed/${VIDEO_ID}` +
     `?autoplay=${LIGADO ? 1 : 0}&mute=1&controls=0&playsinline=1&loop=1` +
-    `&playlist=${VIDEO_ID}&enablejsapi=1&modestbranding=1&rel=0` +
-    (opcoes.leve ? '&vq=small' : '')
+    `&playlist=${VIDEO_ID}&enablejsapi=1&modestbranding=1&rel=0`
   container.appendChild(iframe)
 
   const panel = new CSS3DObject(container)
   panel.position.copy(CENTER)
   panel.rotation.y = -Math.PI / 2
-  panel.scale.setScalar(WIDTH / PIXELS_TELA)
+  panel.scale.setScalar(WIDTH / PIXELS)
   scene.add(panel)
 
   const glow = new THREE.PointLight(0x6f8fd0, brilho, Math.max(16, WIDTH), 1.9)
