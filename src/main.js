@@ -7,6 +7,7 @@ import { createTouchInput } from './player/touch.js'
 import { createAcoes } from './player/acoes.js'
 import { createHud } from './hud/index.js'
 import { createVenueSound } from './sound/venue.js'
+import { sincronizarTelas } from './world/sincronia.js'
 import { createCrowd } from './actors/crowd.js'
 import { carregarPersonagem, criarPersonagem, IDS } from './actors/personagem.js'
 import { createCamera } from './player/camera.js'
@@ -177,6 +178,7 @@ function encherPista(nome) {
 
 let atual = null
 let venue = createVenueSound(null, [], false)
+let sincronia = null
 let imune = true
 
 function descartar(mundo) {
@@ -205,6 +207,8 @@ function entrar(nome) {
     ? createVenueSound(mundo.telao.iframe, CAIXAS_DE_SOM[nome] || [], mundo.telao.ligado, ALCANCE[nome])
     : createVenueSound(null, [], false)
   venue.unlock()
+  if (sincronia) sincronia.parar()
+  sincronia = mundo.telao && mundo.telao.ligado ? sincronizarTelas(venue, mundo.telas || []) : null
 
   imune = true
   hud.sala(comoMostrar(receita.titulo))
@@ -333,7 +337,8 @@ window.game = {
   menu,
   entrar,
   lugar: () => atual.nome,
-  venue: () => venue
+  venue: () => venue,
+  sincronia: () => sincronia
 }
 window.stats = () => ({
   drawCalls: renderer.info.render.calls,
