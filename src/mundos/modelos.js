@@ -64,7 +64,7 @@ export function carregar(nome) {
   if (cache.has(nome)) return cache.get(nome)
   const promessa = new Promise((resolve) => {
     loader.load(
-      `modelos/${nome}.gltf`,
+      nome.endsWith('.glb') ? `modelos/${nome}` : `modelos/${nome}.gltf`,
       (gltf) => resolve(achatar(gltf.scene)),
       undefined,
       () => resolve(null)

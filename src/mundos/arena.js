@@ -299,6 +299,79 @@ async function sobrevoar(grupo, voadores) {
   }
 }
 
+let brilhoMotor = null
+function brilho() {
+  if (brilhoMotor) return brilhoMotor
+  const tela = document.createElement('canvas')
+  tela.width = 64
+  tela.height = 64
+  const ctx = tela.getContext('2d')
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32)
+  g.addColorStop(0, 'rgba(255,255,255,1)')
+  g.addColorStop(0.3, 'rgba(255,255,255,0.6)')
+  g.addColorStop(1, 'rgba(255,255,255,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(0, 0, 64, 64)
+  brilhoMotor = new THREE.CanvasTexture(tela)
+  return brilhoMotor
+}
+
+const FROTA = [
+  { nome: 'Imperial', raio: 152, altura: 80, giro: 0.021, fase: 0.4, escala: 5, inclina: 0.1, motores: 0x9fd0ff },
+  { nome: 'Omen', raio: 116, altura: 62, giro: -0.037, fase: 2.1, escala: 3.4, inclina: 0.2, motores: 0xffb070 },
+  { nome: 'Striker', raio: 136, altura: 96, giro: 0.03, fase: 4, escala: 4.2, inclina: 0.16, motores: 0xc7a6ff },
+  { nome: 'Zenith', raio: 104, altura: 110, giro: -0.025, fase: 5.3, escala: 3.6, inclina: 0.14, motores: 0x8ff0d8 }
+]
+
+async function levantarFrota(grupo, frota) {
+  for (const rota of FROTA) {
+    const partes = await carregar(`naves/${rota.nome}.glb`)
+    if (!partes || !grupo.parent) return
+    const nave = new THREE.Group()
+    for (const parte of partes) {
+      parte.material.emissive = new THREE.Color(0xffffff)
+      parte.material.emissiveMap = parte.material.map
+      parte.material.emissiveIntensity = 0.5
+      parte.material.fog = false
+      parte.material.needsUpdate = true
+      const malha = new THREE.Mesh(parte.geometria, parte.material)
+      malha.frustumCulled = false
+      malha.castShadow = false
+      malha.receiveShadow = false
+      nave.add(malha)
+    }
+
+    const caixa = new THREE.Box3().setFromObject(nave)
+    const fundo = caixa.min.z
+    const meio = (caixa.min.y + caixa.max.y) / 2
+    const vao = (caixa.max.x - caixa.min.x) * 0.26
+    const chamaMat = new THREE.PointsMaterial({
+      color: rota.motores,
+      map: brilho(),
+      size: 14,
+      sizeAttenuation: false,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false
+    })
+    const bocais = new THREE.BufferGeometry()
+    bocais.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute([-vao, meio, fundo - 0.7, vao, meio, fundo - 0.7], 3)
+    )
+    const chamas = new THREE.Points(bocais, chamaMat)
+    chamas.frustumCulled = false
+    nave.add(chamas)
+
+    nave.scale.setScalar(rota.escala)
+    nave.frustumCulled = false
+    grupo.add(nave)
+    frota.push({ nave, rota, chamaMat })
+  }
+}
+
 export const arena = {
   nome: 'arena',
   titulo: 'arena',
@@ -379,11 +452,25 @@ export const arena = {
     adornar(grupo)
     const voadores = []
     sobrevoar(grupo, voadores)
+    const frota = []
+    levantarFrota(grupo, frota)
     let relogio = 0
 
     function animar(dt) {
       relogio += dt
       moverCometa(dt)
+      for (const { nave, rota, chamaMat } of frota) {
+        const a = relogio * rota.giro + rota.fase
+        nave.position.set(
+          -22 + Math.cos(a) * rota.raio,
+          rota.altura + Math.sin(relogio * 0.11 + rota.fase) * 3,
+          Math.sin(a) * rota.raio
+        )
+        nave.rotation.y = rota.giro > 0 ? -a : -a + Math.PI
+        nave.rotation.z = rota.inclina * Math.sign(rota.giro)
+        chamaMat.opacity = 0.72 + Math.sin(relogio * 7 + rota.fase) * 0.16
+        chamaMat.size = 13 + Math.sin(relogio * 9 + rota.fase) * 2.5
+      }
       for (const { objeto, mixer, rota } of voadores) {
         mixer.update(dt)
         const a = relogio * rota.giro + rota.fase

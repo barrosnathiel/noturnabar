@@ -81,6 +81,8 @@ A v1 está pronta quando, num notebook comum:
 ## Como não fugir do escopo
 Toda mudança pedida passa por uma pergunta: está na lista "Dentro"? Se não está, vai pra v2 e o PRD é atualizado com a decisão. Ideia boa que chega no meio do caminho é anotada, não implementada.
 
+**19/10/2026 — céu da arena.** Entrou um cometa cruzando devagar (82s de travessia, 30s de pausa) e quatro naves do pacote Ultimate Spaceships (CC0, Quaternius) em órbitas lentas sobre a arena, com brilho nos motores. Tudo cenário: não colide, não interage, só existe no céu. O far da câmera subiu de 220 para 460 pra caber a órbita.
+
 ## Verificação da v1 (18/10/2026)
 
 Passou, verificado automaticamente no navegador:
