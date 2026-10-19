@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { materials as M } from './materials.js'
 
-const VIDEO_ID = 'k2tDlNdGVQg'
+const VIDEO_ID = 'MToMx6RCW-M'
 const PIXELS = 1280
 const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
 const LIGADO = !LOCAL || new URLSearchParams(location.search).has('video')
