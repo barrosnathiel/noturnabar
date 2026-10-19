@@ -59,20 +59,32 @@ function harmonicos(t, estilo) {
     }
   }
   if (estilo === 'jamal') {
-    const w = 6.4
-    const onda = Math.sin(w * t)
-    const marca = Math.tanh(onda * 2.4)
-    const passo = Math.max(0, onda)
-    const contra = Math.max(0, -onda)
+    const tempos = [0.26, 0.26, 0.16, 0.16, 0.16]
+    const ciclo = 3.5
+    const voltas = Math.floor(t / ciclo)
+    const fase = (t % ciclo) / ciclo
+    let inicio = 0
+    let i = 0
+    while (i < tempos.length - 1 && fase >= inicio + tempos[i]) {
+      inicio += tempos[i]
+      i++
+    }
+    const dentro = (fase - inicio) / tempos[i]
+    const lado = (voltas * tempos.length + i) % 2 === 0 ? 1 : -1
+    const corte = Math.min(1, dentro / 0.4)
+    const suave = corte * corte * (3 - 2 * corte)
+    const marca = -lado + lado * 2 * suave
+    const dir = Math.max(0, marca)
+    const esq = Math.max(0, -marca)
     return {
-      bracoE: 0.12 + passo * 1.32, bracoD: 0.12 + contra * 1.32,
-      abreE: -0.16 - passo * 0.3, abreD: 0.16 + contra * 0.3,
-      anteE: 0.35 + passo * 1.15, anteD: 0.35 + contra * 1.15,
-      pernaE: passo * 0.62 - contra * 0.16,
-      pernaD: contra * 0.62 - passo * 0.16,
-      joelhoE: -passo * 0.55,
-      joelhoD: -contra * 0.55,
-      incl: marca * 0.16, sobe: Math.abs(onda) * 0.05,
+      bracoD: 0.12 + dir * 1.32, bracoE: 0.12 + esq * 1.32,
+      abreD: 0.16 + dir * 0.3, abreE: -0.16 - esq * 0.3,
+      anteD: 0.35 + dir * 1.15, anteE: 0.35 + esq * 1.15,
+      pernaD: -dir * 0.62 + esq * 0.16,
+      pernaE: -esq * 0.62 + dir * 0.16,
+      joelhoD: dir * 0.55,
+      joelhoE: esq * 0.55,
+      incl: marca * 0.16, sobe: Math.abs(marca) * 0.05,
       cabeca: marca * 0.12
     }
   }
