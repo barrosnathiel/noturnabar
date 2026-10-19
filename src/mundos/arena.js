@@ -327,17 +327,60 @@ function texturaLua() {
 function pintarTexto(tela) {
   const ctx = tela.getContext('2d')
   ctx.clearRect(0, 0, tela.width, tela.height)
-  ctx.font = '300px Pacifico, "Snell Roundhand", "Brush Script MT", cursive'
-  ctx.textAlign = 'center'
+  ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
-  ctx.shadowColor = '#ff0620'
-  ctx.shadowBlur = 90
-  ctx.fillStyle = '#ff2c3e'
+
+  const inicio = 'Rock in the '
+  const fim = 'Sky'
+  const familia = 'Pacifico, "Snell Roundhand", "Brush Script MT", cursive'
+  const folga = tela.height * 0.42
+  let corpo = 300
+  let larguraInicio = 0
+  let larguraFim = 0
+  for (; corpo > 120; corpo -= 10) {
+    ctx.font = `${corpo}px ${familia}`
+    larguraInicio = ctx.measureText(inicio).width
+    larguraFim = ctx.measureText(fim).width
+    if (larguraInicio + larguraFim <= tela.width - folga * 2) break
+  }
+
+  const x0 = -(larguraInicio + larguraFim) / 2
+  const pedacos = [
+    { texto: inicio, x: x0, halo: '#ff0620', corpo: '#ff3346', nucleo: '#fff1f2' },
+    { texto: fim, x: x0 + larguraInicio, halo: '#0a5cff', corpo: '#3aa8ff', nucleo: '#f0f9ff' }
+  ]
   ctx.save()
   ctx.translate(tela.width / 2, tela.height / 2)
   ctx.rotate(-0.07)
-  for (let i = 0; i < 5; i++) ctx.fillText('Rock in Rio', 0, 0)
+  for (const pedaco of pedacos) {
+    ctx.shadowColor = pedaco.halo
+    ctx.fillStyle = pedaco.corpo
+    ctx.shadowBlur = 120
+    for (let i = 0; i < 4; i++) ctx.fillText(pedaco.texto, pedaco.x, 0)
+    ctx.shadowBlur = 60
+    for (let i = 0; i < 4; i++) ctx.fillText(pedaco.texto, pedaco.x, 0)
+    ctx.shadowBlur = 24
+    ctx.fillStyle = pedaco.nucleo
+    for (let i = 0; i < 2; i++) ctx.fillText(pedaco.texto, pedaco.x, 0)
+  }
   ctx.restore()
+
+  const margem = folga * 0.8
+  ctx.globalCompositeOperation = 'destination-out'
+  const lados = [
+    [0, 0, margem, 0, tela.width, tela.height],
+    [tela.width, 0, tela.width - margem, 0, tela.width, tela.height],
+    [0, 0, 0, margem, tela.width, tela.height],
+    [0, tela.height, 0, tela.height - margem, tela.width, tela.height]
+  ]
+  for (const [x1, y1, x2, y2] of lados) {
+    const fade = ctx.createLinearGradient(x1, y1, x2, y2)
+    fade.addColorStop(0, 'rgba(0,0,0,1)')
+    fade.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = fade
+    ctx.fillRect(0, 0, tela.width, tela.height)
+  }
+  ctx.globalCompositeOperation = 'source-over'
 }
 
 const TRACO_GUITARRA =
@@ -364,7 +407,7 @@ function pintarGuitarra(tela) {
 function letreiro(grupo) {
   const telaTexto = document.createElement('canvas')
   telaTexto.width = 2048
-  telaTexto.height = 512
+  telaTexto.height = 768
   pintarTexto(telaTexto)
   const mapaTexto = new THREE.CanvasTexture(telaTexto)
   if (document.fonts && document.fonts.load) {
@@ -378,17 +421,19 @@ function letreiro(grupo) {
   }
 
   const texto = new THREE.Mesh(
-    new THREE.PlaneGeometry(38, 9.5),
+    new THREE.PlaneGeometry(38, 14.25),
     new THREE.MeshBasicMaterial({
       map: mapaTexto,
       transparent: true,
       depthWrite: false,
+      depthTest: false,
       blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide,
       fog: false
     })
   )
   texto.position.y = 12.5
+  texto.renderOrder = 12
   texto.frustumCulled = false
 
   const lua = new THREE.Mesh(
@@ -431,21 +476,21 @@ function letreiro(grupo) {
 
   const quadro = new THREE.Group()
   quadro.add(tombo)
-  quadro.position.set(33.6, 37, 0)
+  quadro.position.set(33.6, 45, 0)
   quadro.scale.setScalar(1.05)
   quadro.rotation.y = -Math.PI / 2
   grupo.add(quadro)
 
   const neon = new THREE.PointLight(0xff1a38, 900, 54, 1.9)
-  neon.position.set(30, 44, 0)
+  neon.position.set(30, 52, 0)
   grupo.add(neon)
 
   let tempo = 0
   return (dt) => {
     tempo += dt
     lua.rotation.y += dt * 0.05
-    texto.material.opacity = 0.88 + Math.sin(tempo * 1.6) * 0.12
-    neon.intensity = 820 + Math.sin(tempo * 1.6) * 180
+    texto.material.opacity = 0.94 + Math.sin(tempo * 1.6) * 0.06
+    neon.intensity = 1150 + Math.sin(tempo * 1.6) * 220
   }
 }
 
