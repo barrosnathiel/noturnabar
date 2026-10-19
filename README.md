@@ -65,6 +65,10 @@ Primeira ou terceira pessoa, escolhido no menu do ESC e lembrado entre sessões.
 
 O fundo do palco tem um telão tocando vídeo, e o volume acompanha a sua distância até as caixas de som: colado nelas é 100, no meio da pista 74, lá no hall 37. O som começa mudo e liga no primeiro clique ou toque, porque navegador nenhum deixa um site tocar som sozinho.
 
+## Créditos
+
+Quase tudo é geometria gerada em código. As exceções são quatro peças de cenário da arena (antena, caixotes e barril) do [Sci-Fi Essentials Kit](https://quaternius.com/packs/scifiessentialskit.html) do Quaternius, em CC0, usadas sem as texturas originais.
+
 ## Stack
 
 Three.js e Vite, JavaScript puro. A colisão é própria: AABB contra um grid espacial, com step-up de 0.45m para escada e degrau. Sem engine de física.

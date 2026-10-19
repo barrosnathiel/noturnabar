@@ -123,6 +123,13 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - Intensidade em unidades físicas (iluminância cai com o quadrado da distância): spot do palco 2600, ponto de serviço na casa dos 350 a 420, bar 42. Mexer nesses números sem considerar `distance` e `decay` apaga ou estoura a cena.
 - `FogExp2` com densidade 0.012, cor igual ao fundo
 
+## Modelos externos
+
+- `public/modelos/` tem quatro peças do Sci-Fi Essentials Kit do Quaternius (CC0): antena parabólica, dois caixotes e um barril. São os únicos arquivos de arte do projeto.
+- As texturas do kit foram deixadas de fora de propósito: só as três "trim" compartilhadas somam 15MB, contra 555KB do jogo inteiro. As referências de textura foram removidas dos `.gltf`, senão o carregador pede os arquivos e enche o console de 404. Cada peça é pintada com material nosso, o que também mantém o visual flat do resto.
+- `mundos/modelos.js` carrega, funde a malha numa geometria só, centra na base e devolve para `espalhar`, que monta um `InstancedMesh`. Por isso dezenas de caixotes custam um draw call.
+- O carregamento é assíncrono e o mundo é construído de forma síncrona: os adereços entram quando chegam, e a função confere se o grupo ainda está na cena antes de adicionar, senão enfeita um mundo que o jogador já deixou.
+
 ## Mundos
 
 - Nome do portal é um `CanvasTexture`: o texto é desenhado num canvas e vira plano com transparência. Evita carregar fonte 3D ou arquivo externo, e fica nítido de perto.

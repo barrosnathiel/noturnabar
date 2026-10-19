@@ -1,7 +1,9 @@
 import * as THREE from 'three'
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { createBuilder } from '../world/builder.js'
 import { materials as M } from '../world/materials.js'
 import { buildScreen } from '../world/screen.js'
+import { carregar, espalhar } from './modelos.js'
 
 const PALCO = { x0: 12, x1: 34, z0: -30, z1: 30, topo: 2.8 }
 const PISTA = { x0: -90, x1: 34, z0: -55, z1: 55 }
@@ -30,6 +32,96 @@ function pilhaDeSom(b, x, z) {
   }
   b.box(3.2, 3.6, 3.6, x, 1.8, z, M.darkMetal)
   b.collider([x - 1.6, 0, z - 1.8], [x + 1.6, 22, z + 1.8])
+}
+
+const MAT = {
+  casco: new THREE.MeshStandardMaterial({ color: 0x4d5666, roughness: 0.62, metalness: 0.55, dithering: true }),
+  carga: new THREE.MeshStandardMaterial({ color: 0x56606f, roughness: 0.78, metalness: 0.25, dithering: true }),
+  tambor: new THREE.MeshStandardMaterial({ color: 0x3f4856, roughness: 0.7, metalness: 0.4, dithering: true }),
+  torre: new THREE.MeshStandardMaterial({ color: 0x161c28, roughness: 0.9, metalness: 0.2, dithering: true }),
+  baliza: new THREE.MeshBasicMaterial({ color: 0xff5a6e })
+}
+
+function skyline(grupo) {
+  const blocos = []
+  const balizas = []
+  let semente = 7
+  const sorte = () => {
+    semente = (semente * 1103515245 + 12345) % 2147483648
+    return semente / 2147483648
+  }
+  for (let i = 0; i < 46; i++) {
+    const a = (i / 46) * Math.PI * 2 + sorte() * 0.08
+    const r = 125 + sorte() * 85
+    const largura = 9 + sorte() * 16
+    const altura = 20 + sorte() * 72
+    const g = new THREE.BoxGeometry(largura, altura, largura * (0.7 + sorte() * 0.7))
+    g.translate(Math.cos(a) * r, altura / 2, Math.sin(a) * r)
+    blocos.push(g)
+    if (sorte() > 0.45) {
+      const b = new THREE.SphereGeometry(0.9, 6, 5)
+      b.translate(Math.cos(a) * r, altura + 1.4, Math.sin(a) * r)
+      balizas.push(b)
+    }
+  }
+  const cidade = new THREE.Mesh(mergeGeometries(blocos, false), MAT.torre)
+  blocos.forEach((b) => b.dispose())
+  cidade.frustumCulled = false
+  grupo.add(cidade)
+  if (balizas.length) {
+    const luzes = new THREE.Mesh(mergeGeometries(balizas, false), MAT.baliza)
+    balizas.forEach((b) => b.dispose())
+    luzes.frustumCulled = false
+    grupo.add(luzes)
+  }
+}
+
+async function adornar(grupo) {
+  const [antena, caixa, lona, barril] = await Promise.all([
+    carregar('Prop_SatelliteDish'),
+    carregar('Prop_Crate_Large'),
+    carregar('Prop_Crate_Tarp_Large'),
+    carregar('Prop_Barrel1')
+  ])
+  if (!grupo.parent) return
+
+  if (antena) {
+    grupo.add(espalhar(antena, MAT.casco, [
+      { x: -118, z: -64, escala: 9, giro: 0.5 },
+      { x: -96, z: 78, escala: 7, giro: -0.9 },
+      { x: 62, z: -82, escala: 8, giro: 2.3 },
+      { x: 78, z: 56, escala: 6.5, giro: -2.1 },
+      { x: -10, z: -104, escala: 7.5, giro: 1.2 },
+      { x: 20, z: 96, escala: 6, giro: 3.1 }
+    ]))
+  }
+
+  const pilhas = []
+  const tampados = []
+  for (let i = 0; i < 16; i++) {
+    const lado = i % 2 === 0 ? -1 : 1
+    const x = -84 + Math.floor(i / 2) * 11
+    const base = { x, z: lado * 62, escala: 2.6, giro: (i % 3) * 0.4 }
+    pilhas.push(base)
+    if (i % 3 !== 1) pilhas.push({ ...base, z: lado * 68, escala: 2.4, giro: i * 0.3 })
+    if (i % 4 === 0) tampados.push({ x: x + 4, z: lado * 65, escala: 2.8, giro: i * 0.2 })
+  }
+  if (caixa) grupo.add(espalhar(caixa, MAT.carga, pilhas))
+  if (lona) grupo.add(espalhar(lona, MAT.carga, tampados))
+
+  if (barril) {
+    const tambores = []
+    for (let i = 0; i < 22; i++) {
+      const lado = i % 2 === 0 ? -1 : 1
+      tambores.push({
+        x: -78 + i * 7.4,
+        z: lado * (57 + (i % 3) * 2.5),
+        escala: 2.2,
+        giro: i * 0.7
+      })
+    }
+    grupo.add(espalhar(barril, MAT.tambor, tambores))
+  }
 }
 
 export const arena = {
@@ -105,6 +197,9 @@ export const arena = {
     const pista = new THREE.PointLight(0x7f90bd, 1800, 90, 1.7)
     pista.position.set(-30, 18, 0)
     grupo.add(pista)
+
+    skyline(grupo)
+    adornar(grupo)
 
     const estrelas = new THREE.BufferGeometry()
     const pontos = []
