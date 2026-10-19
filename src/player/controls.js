@@ -98,6 +98,8 @@ export function createControls(camera, canvas, touch) {
     apply,
     setAngles,
     bloquearOlhar: (fn) => { bloqueio = fn },
+    travar: () => { if (!touch.supported && !locked) lock(true) },
+    angulos: () => ({ yaw, pitch }),
     forward,
     right,
     isLocked: () => locked || (touch.supported && touch.engaged()),

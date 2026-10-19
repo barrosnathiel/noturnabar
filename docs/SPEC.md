@@ -135,6 +135,13 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - Posição com número não finito é descartada no servidor, quem fica 20 segundos sem mandar nada é desconectado, e a sala para em 40 pessoas.
 - `src/net/sala.js` tem a constante `PADRAO` com a URL do servidor; `?sala=ws://...` sobrescreve para testar local. Com a constante vazia o jogo roda sozinho, sem rede.
 
+## Câmera e menu
+
+- `player/camera.js` tem os dois modos. Em terceira pessoa a câmera fica 3,4m atrás e 1,52m acima, na direção oposta ao olhar, e encurta quando há parede no caminho: um raio do ombro até a posição desejada contra os mesmos colisores do mundo, com margem de 0,32m. Sem isso a câmera entra na parede e mostra o lado de fora.
+- O jogador ganha o próprio avatar, escondido em primeira pessoa — visível, a cabeça taparia a tela.
+- O menu abre quando o pointer lock cai, que é o que o ESC já faz. Abrir só depois da primeira entrada, senão ele aparece na carga da página. No celular, onde não existe ESC, há um botão MENU no topo.
+- A escolha de câmera fica em `localStorage`; toda leitura e escrita vai em try/catch porque em janela anônima o acesso pode lançar.
+
 ## Avatares
 
 - `actors/avatar.js` monta os dois tipos com primitivas e devolve `root` mais um `update(dt, speed)`. Geometrias e materiais ficam em cache por tipo, então o segundo ET não recria nada.

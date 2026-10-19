@@ -23,7 +23,7 @@ Abre em http://localhost:3490.
 | Tecla | Ação |
 |---|---|
 | Clique na tela | trava o mouse |
-| ESC | solta o mouse |
+| ESC | abre o menu e solta o mouse |
 | W A S D | andar |
 | Shift | correr |
 | Espaço | pular |
@@ -50,6 +50,10 @@ O primeiro toque na tela já tenta entrar em tela cheia e travar em paisagem. No
 Quem entra ganha um avatar sorteado entre um ET e um porco, e vê os outros andando pela casa. A sala é um servidor Node com WebSocket em `server/`, publicado em https://noturnabar.onrender.com — ele hiberna sem tráfego, então a primeira conexão depois de um tempo parado leva até um minuto para acordar.
 
 Para rodar a sala localmente: `npm start` dentro de `server/`, e abrir o jogo com `?sala=ws://localhost:3491`.
+
+## Câmera
+
+Primeira ou terceira pessoa, escolhido no menu do ESC e lembrado entre sessões. Em terceira pessoa a câmera fica atrás do seu avatar e encurta sozinha quando tem parede no caminho.
 
 ## Telão
 

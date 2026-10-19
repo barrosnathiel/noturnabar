@@ -11,6 +11,9 @@ import { createAcoes } from './player/acoes.js'
 import { createHud } from './hud/index.js'
 import { createVenueSound } from './sound/venue.js'
 import { createCrowd } from './actors/crowd.js'
+import { createAvatar, SKIN_NAMES } from './actors/avatar.js'
+import { createCamera } from './player/camera.js'
+import { createMenu } from './player/menu.js'
 import { conectarSala } from './net/sala.js'
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
@@ -52,23 +55,45 @@ const rotas = [
 ]
 if (demo) rotas.forEach((rota) => crowd.spawn(rota.id, rota.kind))
 
+let eu = null
+
+function vestir(tipo) {
+  if (eu) scene.remove(eu.root)
+  eu = createAvatar(tipo)
+  eu.root.visible = false
+  scene.add(eu.root)
+}
+
 const sala = conectarSala(crowd, (tipo) => {
   hud.sala(`você é o ${tipo}`)
+  vestir(tipo)
 })
 
 const world = createCollisionWorld(colliders)
+const camera3 = createCamera(camera, world)
 const player = createPlayer(world, new THREE.Vector3(-18, 0, 0))
 const touch = createTouchInput()
 const controls = createControls(camera, renderer.domElement, touch)
 const acoes = createAcoes(touch)
 controls.bloquearOlhar(acoes.aberta)
+
+const menu = createMenu(
+  (modo) => camera3.definir(modo),
+  () => controls.travar()
+)
 const hud = createHud()
+
+let entrou = false
 
 controls.onLockChange((locked) => {
   if (locked) {
+    entrou = true
     hud.dismissHelp()
     venue.unlock()
+    menu.fechar()
+    return
   }
+  if (entrou) menu.abrir()
 })
 
 for (const gesto of ['pointerdown', 'keydown', 'touchstart']) {
@@ -107,8 +132,16 @@ function frame(now = performance.now()) {
   last = now
   const input = controls.sample(dt)
   player.update(dt, input, controls.forward, controls.right)
-  camera.position.set(player.position.x, player.position.y + PLAYER.eye, player.position.z)
+  const { yaw, pitch } = controls.angulos()
+  const andando = Math.hypot(player.velocity.x, player.velocity.z)
+  if (eu) {
+    eu.root.visible = camera3.modo() === 'terceira'
+    eu.root.position.copy(player.position)
+    eu.root.rotation.y = yaw + Math.PI
+    eu.update(dt, andando, acoes.atual())
+  }
   controls.apply()
+  camera3.aplicar(player.position, PLAYER.eye, yaw, pitch)
   if (demo) {
     const t = performance.now() / 1000
     for (const rota of rotas) {
@@ -135,7 +168,9 @@ function frame(now = performance.now()) {
 
 frame()
 
-window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd, sala, acoes }
+if (!eu) vestir(SKIN_NAMES[Math.floor(Math.random() * SKIN_NAMES.length)])
+
+window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd, sala, acoes, camera3, menu }
 window.stats = () => ({
   drawCalls: renderer.info.render.calls,
   triangles: renderer.info.render.triangles,

@@ -18,6 +18,17 @@
       #hud { position: fixed; inset: 0; z-index: 2; pointer-events: none; font-family: ui-monospace, Menlo, monospace; color: #d8d8e0; }
       #crosshair { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: #e8e8f0; opacity: .75; box-shadow: 0 0 3px #000; }
       #sound { position: absolute; top: calc(38px + env(safe-area-inset-top)); right: calc(14px + env(safe-area-inset-right)); font-size: 11px; letter-spacing: 1px; padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,.2); background: rgba(14,14,20,.6); display: none; }
+      #menu { position: fixed; inset: 0; z-index: 3; display: none; align-items: center; justify-content: center; background: rgba(6,6,10,.72); font-family: ui-monospace, Menlo, monospace; }
+      body.menu #menu { display: flex; }
+      #menu .caixa { background: rgba(12,12,18,.96); border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: 26px 30px; min-width: 300px; }
+      #menu .t { font-size: 13px; letter-spacing: 3px; color: #d8d8e0; margin-bottom: 20px; text-align: center; opacity: .8; }
+      #menu .rotulo { font-size: 11px; letter-spacing: 1px; color: #8d8d9b; margin-bottom: 8px; }
+      #menu .grupo { display: flex; gap: 8px; margin-bottom: 20px; }
+      #menu button { flex: 1; padding: 9px 12px; border-radius: 5px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.04); color: #cfcfdb; font-family: inherit; font-size: 12px; cursor: pointer; }
+      #menu button.on { border-color: rgba(255,255,255,.6); background: rgba(120,140,200,.45); color: #fff; }
+      #voltar { width: 100%; padding: 11px; letter-spacing: 1px; }
+      #abrirmenu { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,.18); background: rgba(14,14,20,.5); font-size: 10px; letter-spacing: 1px; color: #cfcfdb; display: none; pointer-events: auto; }
+      body.touch #abrirmenu { display: block; }
       #roda { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none; }
       body.roda #roda { display: block; }
       .op { position: absolute; transform: translate(-50%, -50%); padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.2); background: rgba(14,14,20,.82); font-size: 11px; letter-spacing: 1px; color: #cfcfdb; white-space: nowrap; }
@@ -61,6 +72,7 @@
       <div id="fps">-- fps</div>
       <div id="sound">clique na tela para o som</div>
       <div id="sala"></div>
+      <div id="abrirmenu">MENU</div>
       <div id="roda">
         <div class="op" data-a="balanco" style="left:-118px;top:0">BALANÇO</div>
         <div class="op" data-a="maos" style="left:0;top:-82px">MÃOS PRO ALTO</div>
@@ -87,6 +99,17 @@
         <div id="run" class="pad">CORRER</div>
         <div id="full">TELA CHEIA</div>
         <div id="iosinfo">o Safari do iPhone não deixa um site entrar em tela cheia. Para jogar sem as barras: toque em Compartilhar e depois em Adicionar à Tela de Início, e abra por lá.</div>
+      </div>
+    </div>
+    <div id="menu">
+      <div class="caixa">
+        <div class="t">PAUSA</div>
+        <div class="rotulo">câmera</div>
+        <div class="grupo">
+          <button data-cam="primeira">1ª pessoa</button>
+          <button data-cam="terceira">3ª pessoa</button>
+        </div>
+        <button id="voltar">voltar ao jogo</button>
       </div>
     </div>
     <div id="rotate">vire o celular na horizontal<br />para entrar na casa</div>
