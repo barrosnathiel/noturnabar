@@ -12,6 +12,8 @@ import { carregarPersonagem, criarPersonagem, IDS } from './actors/personagem.js
 import { createCamera } from './player/camera.js'
 import { createMenu } from './player/menu.js'
 import { createSelecao } from './player/selecao.js'
+import { createAcesso } from './player/acesso.js'
+import { sessao, nome as nomeDaConta } from './player/conta.js'
 import { conectarSala } from './net/sala.js'
 import { lobby } from './mundos/lobby.js'
 import { casa } from './mundos/casa.js'
@@ -67,7 +69,7 @@ const mundoColisor = {
   }
 }
 
-const crowd = createCrowd(scene)
+const crowd = createCrowd(scene, camera)
 const camera3 = createCamera(camera, mundoColisor)
 const player = createPlayer(mundoColisor, new THREE.Vector3(0, 0, 0))
 const touch = createTouchInput()
@@ -104,17 +106,47 @@ let sala = {
   online: () => 0
 }
 
-createSelecao((escolhido) => {
+let meuNome = nomeDaConta()
+
+createAcesso(() => {
+  meuNome = nomeDaConta()
+  if (atual) hud.sala(comoMostrar(atual.titulo))
+})
+
+function comoMostrar(titulo) {
+  if (meuNome) return `${titulo} · ${meuNome}`
+  return meuTipo ? `${titulo} · você é o ${meuTipo}` : titulo
+}
+
+function comecar(escolhido, comoChamar) {
+  if (comoChamar) meuNome = comoChamar
   vestir(escolhido)
   sala = conectarSala(
     crowd,
     (tipo) => {
       vestir(tipo)
-      hud.sala(atual ? `${atual.titulo} · ${tipo}` : tipo)
+      hud.sala(atual ? comoMostrar(atual.titulo) : tipo)
     },
-    escolhido
+    escolhido,
+    meuNome
   )
-})
+}
+
+const logado = sessao()
+if (logado) {
+  let salvo = 'Alien'
+  try {
+    salvo = localStorage.getItem('noturnabar.personagem') || salvo
+  } catch (erro) {
+    void erro
+  }
+  const tela = document.getElementById('escolha')
+  if (tela) tela.remove()
+  document.body.classList.add('jogando')
+  comecar(salvo, nomeDaConta())
+} else {
+  createSelecao((escolhido, comoChamar) => comecar(escolhido, comoChamar))
+}
 
 const FIGURANTES = Math.min(
   parseInt(new URLSearchParams(location.search).get('multidao') || '0', 10) || 0,
@@ -175,7 +207,7 @@ function entrar(nome) {
   venue.unlock()
 
   imune = true
-  hud.sala(meuTipo ? `${receita.titulo} · você é o ${meuTipo}` : receita.titulo)
+  hud.sala(comoMostrar(receita.titulo))
   crowd.limpar()
   encherPista(nome)
   renderer.shadowMap.needsUpdate = true
@@ -230,7 +262,7 @@ window.addEventListener('resize', () => {
   renderer.setClearColor(0x07070a, 0)
 })
 
-entrar(new URLSearchParams(location.search).get('lugar') || 'lobby')
+entrar(new URLSearchParams(location.search).get('lugar') || (logado ? 'arena' : 'lobby'))
 
 
 const warmUp = renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve()

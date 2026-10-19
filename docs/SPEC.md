@@ -180,6 +180,8 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - O estado vira animação em `update`: parado é Idle, andando é Walk com `timeScale` proporcional à velocidade, dançando é Dance. A troca usa `fadeIn`/`fadeOut` de 0,25s, senão o personagem salta de uma pose para outra.
 - `player/selecao.js` é a tela de escolha, com cena e renderer próprios num canvas pequeno. Carrega um personagem por vez, conforme você navega, em vez de baixar os oito de uma vez. Ao confirmar, o canvas sai da página e o renderer é descartado — dois contextos WebGL vivos ao mesmo tempo custam caro.
 - O tipo escolhido vai para o servidor numa mensagem `sou` logo após conectar; antes o servidor sorteava e o jogador não tinha voz.
+- A mesma mensagem `sou` leva o `nome` do jogador. O servidor corta em 16 caracteres, remove caracteres de controle e aceita vazio; o nome entra no estado difundido a 15Hz e no `entrou`. Cliente antigo que não manda `nome` continua funcionando: o campo chega vazio e o avatar fica sem etiqueta.
+- A etiqueta é um `Sprite` com `CanvasTexture`, filho do root do avatar, a 2,15m do chão, escondida acima de 25m de distância da câmera. Figurante de multidão não tem nome, então não ganha sprite: com `?multidao=200` a cena continua a 60fps e só existe um sprite por jogador real.
 
 ## Avatares antigos (removidos)
 

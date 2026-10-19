@@ -3,7 +3,7 @@ const RECONEXAO = 4000
 
 const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
 
-export function conectarSala(crowd, aoEntrar, tipoEscolhido) {
+export function conectarSala(crowd, aoEntrar, tipoEscolhido, nomeEscolhido = '') {
   const escolhida = new URLSearchParams(location.search).get('sala')
   const url = escolhida || (LOCAL ? '' : PADRAO)
   if (!url) {
@@ -24,7 +24,7 @@ export function conectarSala(crowd, aoEntrar, tipoEscolhido) {
 
     socket.onopen = () => {
       estado = 'na sala'
-      if (tipoEscolhido) socket.send(JSON.stringify({ t: 'sou', tipo: tipoEscolhido }))
+      if (tipoEscolhido) socket.send(JSON.stringify({ t: 'sou', tipo: tipoEscolhido, nome: nomeEscolhido }))
     }
 
     socket.onmessage = (evento) => {
@@ -39,14 +39,15 @@ export function conectarSala(crowd, aoEntrar, tipoEscolhido) {
         aoEntrar(tipoEscolhido || dados.tipo)
         for (const outro of dados.outros) {
           if ((outro.lugar || 'lobby') !== meuLugar) continue
-          crowd.spawn(outro.id, outro.tipo)
+          crowd.spawn(outro.id, outro.tipo, outro.nome)
           crowd.place(outro.id, outro.x, outro.y, outro.z, outro.yaw, outro.acao)
           vistos.add(outro.id)
         }
         return
       }
       if (dados.t === 'entrou') {
-        crowd.spawn(dados.jogador.id, dados.jogador.tipo)
+        crowd.spawn(dados.jogador.id, dados.jogador.tipo, dados.jogador.nome)
+        crowd.nomear(dados.jogador.id, dados.jogador.nome)
         vistos.add(dados.jogador.id)
         return
       }
@@ -68,9 +69,10 @@ export function conectarSala(crowd, aoEntrar, tipoEscolhido) {
         if ((outro.lugar || 'lobby') !== meuLugar) continue
         presentes.add(outro.id)
         if (!vistos.has(outro.id)) {
-          crowd.spawn(outro.id, outro.tipo)
+          crowd.spawn(outro.id, outro.tipo, outro.nome)
           vistos.add(outro.id)
         }
+        crowd.nomear(outro.id, outro.nome)
         crowd.place(outro.id, outro.x, outro.y, outro.z, outro.yaw, outro.acao)
       }
       for (const id of [...vistos]) {

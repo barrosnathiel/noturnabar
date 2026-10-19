@@ -9,6 +9,13 @@ const TIPOS = ['Alien', 'Cactoro', 'Yeti', 'Ninja', 'Frog', 'Dino', 'Orc', 'Bunn
 const ACOES = ['nada', 'balanco', 'maos', 'solto', 'jamal']
 const LUGARES = ['lobby', 'casa', 'arena']
 
+function limparNome(valor) {
+  return String(valor ?? '')
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .trim()
+    .slice(0, 16)
+}
+
 const jogadores = new Map()
 let proximoId = 1
 
@@ -37,7 +44,7 @@ wss.on('connection', (socket) => {
 
   const id = proximoId++
   const tipo = TIPOS[Math.floor(Math.random() * TIPOS.length)]
-  const jogador = { id, tipo, x: -18, y: 0, z: 0, yaw: -Math.PI / 2, acao: 'nada', lugar: 'lobby', visto: Date.now() }
+  const jogador = { id, tipo, nome: '', x: -18, y: 0, z: 0, yaw: -Math.PI / 2, acao: 'nada', lugar: 'lobby', visto: Date.now() }
   jogadores.set(id, { jogador, socket })
 
   envia(socket, {
@@ -62,6 +69,7 @@ wss.on('connection', (socket) => {
       const alvo = jogadores.get(id)
       if (alvo && TIPOS.includes(dados.tipo)) {
         alvo.jogador.tipo = dados.tipo
+        alvo.jogador.nome = limparNome(dados.nome)
         for (const { socket: outro, jogador: dono } of jogadores.values()) {
           if (dono.id !== id) envia(outro, { t: 'entrou', jogador: alvo.jogador })
         }
@@ -104,6 +112,7 @@ setInterval(() => {
   const estado = [...jogadores.values()].map(({ jogador }) => ({
     id: jogador.id,
     tipo: jogador.tipo,
+    nome: jogador.nome,
     x: Math.round(jogador.x * 100) / 100,
     y: Math.round(jogador.y * 100) / 100,
     z: Math.round(jogador.z * 100) / 100,

@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { PERSONAGENS, carregarPersonagem, criarPersonagem } from '../actors/personagem.js'
+import { nome as nomeSalvo, guardarNome } from './conta.js'
 
 const CHAVE = 'noturnabar.personagem'
 
@@ -8,6 +9,11 @@ export function createSelecao(aoEntrar) {
   const canvas = document.getElementById('vitrine')
   const rotulo = document.getElementById('nomePersonagem')
   const botaoEntrar = document.getElementById('entrar')
+  const campoNome = document.getElementById('apelido')
+  if (campoNome) {
+    campoNome.value = nomeSalvo()
+    campoNome.addEventListener('keydown', (evento) => evento.stopPropagation())
+  }
 
   let indice = 0
   try {
@@ -83,9 +89,10 @@ export function createSelecao(aoEntrar) {
     } catch (erro) {
       void erro
     }
+    const comoChamar = guardarNome(campoNome ? campoNome.value : '')
     document.body.classList.add('jogando')
     tela.remove()
-    aoEntrar(escolha.id)
+    aoEntrar(escolha.id, comoChamar)
   }
 
   function quadro(agora) {

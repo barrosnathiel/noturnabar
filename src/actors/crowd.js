@@ -2,11 +2,67 @@ import * as THREE from 'three'
 import { carregarPersonagem, criarPersonagem, IDS } from './personagem.js'
 
 const sorteado = () => IDS[Math.floor(Math.random() * IDS.length)]
+const ALCANCE_NOME = 25
 
-export function createCrowd(scene) {
+function pintarNome(texto) {
+  const tela = document.createElement('canvas')
+  tela.width = 256
+  tela.height = 64
+  const ctx = tela.getContext('2d')
+  ctx.font = 'bold 32px ui-monospace, Menlo, monospace'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.shadowColor = 'rgba(4,6,12,0.9)'
+  ctx.shadowBlur = 12
+  ctx.fillStyle = '#eef1ff'
+  for (let i = 0; i < 3; i++) ctx.fillText(texto, 128, 34)
+  const mapa = new THREE.CanvasTexture(tela)
+  mapa.colorSpace = THREE.SRGBColorSpace
+  return mapa
+}
+
+export function createCrowd(scene, camera) {
   const people = new Map()
+  const aqui = new THREE.Vector3()
 
-  function spawn(id, tipo = sorteado()) {
+  function etiqueta(pessoa) {
+    if (!pessoa.nome || !pessoa.avatar) return
+    if (pessoa.placa) {
+      pessoa.placa.material.map.dispose()
+      pessoa.placa.material.map = pintarNome(pessoa.nome)
+      return
+    }
+    const material = new THREE.SpriteMaterial({
+      map: pintarNome(pessoa.nome),
+      transparent: true,
+      depthWrite: false,
+      fog: false
+    })
+    const placa = new THREE.Sprite(material)
+    placa.scale.set(1.5, 0.375, 1)
+    placa.position.y = 2.15
+    placa.frustumCulled = false
+    pessoa.avatar.root.add(placa)
+    pessoa.placa = placa
+  }
+
+  function nomear(id, nome) {
+    const pessoa = people.get(id)
+    if (!pessoa) return
+    const limpo = String(nome || '').slice(0, 16)
+    if (pessoa.nome === limpo) return
+    pessoa.nome = limpo
+    if (!limpo && pessoa.placa) {
+      pessoa.avatar.root.remove(pessoa.placa)
+      pessoa.placa.material.map.dispose()
+      pessoa.placa.material.dispose()
+      pessoa.placa = null
+      return
+    }
+    etiqueta(pessoa)
+  }
+
+  function spawn(id, tipo = sorteado(), nome = '') {
     let pessoa = people.get(id)
     if (pessoa) return pessoa
     pessoa = {
@@ -18,6 +74,8 @@ export function createCrowd(scene) {
       targetYaw: 0,
       speed: 0,
       acao: 'nada',
+      nome: String(nome || '').slice(0, 16),
+      placa: null,
       vivo: true
     }
     people.set(id, pessoa)
@@ -26,6 +84,7 @@ export function createCrowd(scene) {
       pessoa.avatar = criarPersonagem(modelo)
       pessoa.avatar.root.position.copy(pessoa.target)
       scene.add(pessoa.avatar.root)
+      etiqueta(pessoa)
     })
     return pessoa
   }
@@ -67,8 +126,13 @@ export function createCrowd(scene) {
       root.rotation.y = pessoa.yaw + Math.PI
       pessoa.avatar.update(dt, pessoa.speed, pessoa.acao)
       pessoa.speed *= Math.max(0, 1 - dt * 3)
+      if (pessoa.placa) {
+        aqui.copy(root.position)
+        const longe = camera ? aqui.distanceTo(camera.position) : 0
+        pessoa.placa.visible = longe < ALCANCE_NOME
+      }
     }
   }
 
-  return { spawn, place, remove, update, limpar, count: () => people.size }
+  return { spawn, place, remove, update, limpar, nomear, count: () => people.size }
 }

@@ -85,6 +85,8 @@ Toda mudança pedida passa por uma pergunta: está na lista "Dentro"? Se não es
 
 **19/10/2026 — passinho do Jamal.** Quarta dança, tirada de um gif de referência: antebraços rodando na frente do peito e troca rápida de pés. Entra na roda (para baixo), na tecla 4, na barra do celular e no sorteio da multidão. No caminho apareceu um bug antigo: os nomes dos ossos na lista eram `UpperArm.L` e os modelos atuais usam `UpperArmL`, então as danças só mexiam tronco, cabeça e quadril. Corrigido — as quatro agora animam braços e pernas de verdade. Enquanto o jogador dança, o corpo para de acompanhar a mira: o boneco fica fixo e a câmera de terceira pessoa orbita em volta, pra dar pra ver a dança de frente.
 
+**19/10/2026 — conta opcional.** Entrar continua livre: quem não quer conta escolhe personagem, digita um nome e entra no lobby. Quem quiser cria conta com email e senha num painel flutuante ao lado do contador de gente online; com a conta ativa, abrir o jogo cai direto na arena com o nome da conta, sem passar pela escolha. As contas ficam no localStorage do navegador (senha guardada como hash SHA-256), sem servidor e sem validação de email — serve pro fluxo, não é autenticação de verdade. O nome vai junto na identificação da sala e aparece numa etiqueta sobre a cabeça do avatar, sumindo acima de 25m.
+
 ## Verificação da v1 (18/10/2026)
 
 Passou, verificado automaticamente no navegador:
