@@ -52,5 +52,10 @@ export function createCrowd(scene) {
     }
   }
 
-  return { spawn, place, remove, update, count: () => people.size }
+  function limpar() {
+    for (const pessoa of people.values()) scene.remove(pessoa.avatar.root)
+    people.clear()
+  }
+
+  return { spawn, place, remove, update, limpar, count: () => people.size }
 }

@@ -23,7 +23,6 @@ Uma pessoa, no desktop, com teclado e mouse, abrindo uma URL. Sem login, sem sav
 - Público e NPC: ninguém na casa além dos jogadores de verdade
 - Áudio próprio: passos, ambiente, qualquer som que não venha do telão
 - Show acontecendo: banda, luz sincronizada
-- Mundo aberto, rua, qualquer coisa fora do galpão
 - Interiores de banheiro e camarim (porta fechada é o limite)
 - Interagir com objeto: abrir porta, pegar copo, sentar
 - Menu, configurações, save, gamepad, VR
@@ -47,6 +46,12 @@ O que continua fora no celular: gamepad, giroscópio, vibração e qualquer ajus
 **18/10/2026 — multiplayer básico entra na v1.** Quem entra ganha um avatar sorteado entre dois, um ET e um porco bípede, e vê os outros andando pela casa. Nada além disso: sem voz, sem texto, sem nome em cima da cabeça, sem interação entre jogadores.
 
 O front continua estático na Vercel e a sala vira um processo Node com WebSocket no Render. Sem a variável do servidor configurada, o jogo roda sozinho como antes.
+
+**18/10/2026 — lobby e arena entram na v1.** O jogo passa a nascer num lobby com dois portais. Atravessar um portal troca de mundo sem recarregar a página: a casa de show sai de cena e o novo lugar é montado.
+
+A arena é o segundo mundo: pista de 80m a céu aberto, palco de 2,6m, telão de 28x11m mais dois laterais, duas pilhas de som de 13m e torres de treliça de 30m. Sem pirotecnia, que foi cortada antes de começar por ser o item mais caro para o celular.
+
+Continua fora: show acontecendo, DJ compartilhado, a rua entre os lugares e bate-papo entre jogadores. Esses quatro estão no backlog, nessa ordem.
 
 Dois limites que vêm da plataforma, não de escolha nossa:
 

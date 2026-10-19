@@ -18,11 +18,7 @@ export function createVenueSound(iframe, speakers, ligado = true) {
   let mutedCache = true
   let checkedAt = 0
 
-  const tag = document.createElement('script')
-  tag.src = 'https://www.youtube.com/iframe_api'
-  document.head.appendChild(tag)
-
-  window.onYouTubeIframeAPIReady = () => {
+  function criarPlayer() {
     player = new window.YT.Player(iframe, {
       events: {
         onReady: () => {
@@ -32,6 +28,21 @@ export function createVenueSound(iframe, speakers, ligado = true) {
         }
       }
     })
+  }
+
+  if (window.YT && window.YT.Player) {
+    criarPlayer()
+  } else {
+    const anterior = window.onYouTubeIframeAPIReady
+    window.onYouTubeIframeAPIReady = () => {
+      if (typeof anterior === 'function') anterior()
+      criarPlayer()
+    }
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+      const tag = document.createElement('script')
+      tag.src = 'https://www.youtube.com/iframe_api'
+      document.head.appendChild(tag)
+    }
   }
 
   function unlock() {

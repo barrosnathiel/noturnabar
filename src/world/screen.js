@@ -3,16 +3,18 @@ import { CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { materials as M } from './materials.js'
 
 const VIDEO_ID = 'qfYwoaBSOm8'
-const WIDTH = 16
-const HEIGHT = 9
 const PIXELS = 1280
-const CENTER = new THREE.Vector3(19.5, 5.9, 0)
 const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
 const LIGADO = !LOCAL || new URLSearchParams(location.search).has('video')
 
-export function buildScreen(scene) {
+export function buildScreen(scene, opcoes = {}) {
+  const WIDTH = opcoes.largura ?? 16
+  const HEIGHT = opcoes.altura ?? 9
+  const CENTER = opcoes.centro ?? new THREE.Vector3(19.5, 5.9, 0)
+  const moldura = opcoes.moldura ?? 0.5
+  const brilho = opcoes.brilho ?? 60
   const frame = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, HEIGHT + 0.5, WIDTH + 0.5),
+    new THREE.BoxGeometry(0.18, HEIGHT + moldura, WIDTH + moldura),
     M.darkMetal
   )
   frame.position.set(CENTER.x + 0.12, CENTER.y, CENTER.z)
@@ -48,8 +50,8 @@ export function buildScreen(scene) {
   panel.scale.setScalar(WIDTH / PIXELS)
   scene.add(panel)
 
-  const glow = new THREE.PointLight(0x6f8fd0, 60, 16, 1.9)
-  glow.position.set(CENTER.x - 2.5, CENTER.y, CENTER.z)
+  const glow = new THREE.PointLight(0x6f8fd0, brilho, Math.max(16, WIDTH), 1.9)
+  glow.position.set(CENTER.x - WIDTH * 0.2, CENTER.y, CENTER.z)
   scene.add(glow)
 
   return { iframe, center: CENTER, ligado: LIGADO }

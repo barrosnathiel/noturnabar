@@ -7,6 +7,7 @@ const LIMITE = 40
 const SILENCIO = 20000
 const TIPOS = ['et', 'porco']
 const ACOES = ['nada', 'balanco', 'maos', 'solto']
+const LUGARES = ['lobby', 'casa', 'arena']
 
 const jogadores = new Map()
 let proximoId = 1
@@ -36,7 +37,7 @@ wss.on('connection', (socket) => {
 
   const id = proximoId++
   const tipo = TIPOS[Math.floor(Math.random() * TIPOS.length)]
-  const jogador = { id, tipo, x: -18, y: 0, z: 0, yaw: -Math.PI / 2, acao: 'nada', visto: Date.now() }
+  const jogador = { id, tipo, x: -18, y: 0, z: 0, yaw: -Math.PI / 2, acao: 'nada', lugar: 'lobby', visto: Date.now() }
   jogadores.set(id, { jogador, socket })
 
   envia(socket, {
@@ -67,6 +68,7 @@ wss.on('connection', (socket) => {
     p.z = dados.z
     p.yaw = dados.yaw
     p.acao = ACOES.includes(dados.acao) ? dados.acao : 'nada'
+    p.lugar = LUGARES.includes(dados.lugar) ? dados.lugar : 'lobby'
     p.visto = Date.now()
   })
 
@@ -96,7 +98,8 @@ setInterval(() => {
     y: Math.round(jogador.y * 100) / 100,
     z: Math.round(jogador.z * 100) / 100,
     yaw: Math.round(jogador.yaw * 1000) / 1000,
-    acao: jogador.acao
+    acao: jogador.acao,
+    lugar: jogador.lugar
   }))
   for (const { socket, jogador } of jogadores.values()) {
     envia(socket, { t: 'estado', jogadores: estado.filter((p) => p.id !== jogador.id) })

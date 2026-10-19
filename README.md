@@ -45,6 +45,12 @@ Funciona em paisagem. Em retrato a tela pede para girar o aparelho.
 
 O primeiro toque na tela já tenta entrar em tela cheia e travar em paisagem. No iPhone isso não existe: o Safari não deixa um site entrar em tela cheia, então o jeito de jogar sem as barras é Compartilhar e Adicionar à Tela de Início, que abre pelo manifest em paisagem.
 
+## Lugares
+
+O jogo nasce num lobby com dois portais: a casa de show e a arena. Atravessar troca de mundo na hora, sem recarregar. A arena é a céu aberto, com 80m de pista, telão de 28x11m e pilhas de som de 13m.
+
+Para entrar direto num lugar: `?lugar=arena` ou `?lugar=casa`.
+
 ## Multiplayer
 
 Quem entra ganha um avatar sorteado entre um ET e um porco, e vê os outros andando pela casa. A sala é um servidor Node com WebSocket em `server/`, publicado em https://noturnabar.onrender.com — ele hiberna sem tráfego, então a primeira conexão depois de um tempo parado leva até um minuto para acordar.

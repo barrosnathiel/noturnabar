@@ -123,6 +123,14 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 - Intensidade em unidades físicas (iluminância cai com o quadrado da distância): spot do palco 2600, ponto de serviço na casa dos 350 a 420, bar 42. Mexer nesses números sem considerar `distance` e `decay` apaga ou estoura a cena.
 - `FogExp2` com densidade 0.012, cor igual ao fundo
 
+## Mundos
+
+- Cada lugar é um módulo em `mundos/` com `construir()`, que devolve o grupo, os colisores, o spawn, o telão e os portais. Nada é adicionado à cena direto: tudo pendura num `Group`, que é o que permite descartar o mundo inteiro de uma vez.
+- O colisor é trocado a quente. `main` guarda um wrapper que delega para o mundo atual, então o jogador e a câmera seguem apontando para o mesmo objeto a vida toda.
+- Ao descartar, as geometrias são liberadas e os elementos DOM dos `CSS3DObject` removidos à mão; sem isso o iframe do telão fica órfão no documento.
+- Portal é uma `Box3`. Ao entrar num mundo o jogador fica imune até sair de qualquer caixa de portal, senão ele renasce dentro do portal de volta e pinga entre os dois mundos.
+- `?lugar=arena` entra direto, útil para desenvolver sem atravessar o lobby.
+
 ## Sala
 
 Front estático na Vercel, sala num processo Node no Render. No plano gratuito o Render hiberna depois de ~15 minutos sem tráfego, então a primeira conexão demora a acordar; é por isso que o front não mora lá.
@@ -132,6 +140,7 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - O cliente envia a própria posição no máximo 15 vezes por segundo; o servidor rebate o estado na mesma cadência, sempre sem o registro do próprio destinatário — por isso ninguém vê o próprio avatar.
 - `crowd.place` guarda a posição alvo e `crowd.update` interpola até lá, senão o movimento sairia aos pulos de pacote em pacote.
 - O yaw que trafega é o da câmera, que olha para -Z, mas os avatares são montados com o rosto para +Z. Por isso `crowd` soma meia volta ao aplicar a rotação. Sem isso todo mundo aparece de costas exatamente quando está de frente.
+- O lugar viaja junto com a posição e o cliente só mostra quem está no mesmo lugar. Sem isso, quem está na arena vê gente andando no vazio com as coordenadas da casa.
 - Posição com número não finito é descartada no servidor, quem fica 20 segundos sem mandar nada é desconectado, e a sala para em 40 pessoas.
 - `src/net/sala.js` tem a constante `PADRAO` com a URL do servidor; `?sala=ws://...` sobrescreve para testar local. Com a constante vazia o jogo roda sozinho, sem rede.
 

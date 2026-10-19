@@ -1,8 +1,5 @@
 import * as THREE from 'three'
 import { CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
-import { buildWorld } from './world/index.js'
-import { buildScreen } from './world/screen.js'
-import { buildLighting } from './lighting/index.js'
 import { createCollisionWorld } from './player/collision.js'
 import { createPlayer, PLAYER } from './player/physics.js'
 import { createControls } from './player/controls.js'
@@ -15,6 +12,20 @@ import { createAvatar, SKIN_NAMES } from './actors/avatar.js'
 import { createCamera } from './player/camera.js'
 import { createMenu } from './player/menu.js'
 import { conectarSala } from './net/sala.js'
+import { lobby } from './mundos/lobby.js'
+import { casa } from './mundos/casa.js'
+import { arena } from './mundos/arena.js'
+
+const MUNDOS = { lobby, casa, arena }
+const CAIXAS_DE_SOM = {
+  casa: [
+    new THREE.Vector3(12.2, 1.75, 8.6),
+    new THREE.Vector3(12.2, 2.75, 8.6),
+    new THREE.Vector3(12.2, 1.75, -8.6),
+    new THREE.Vector3(12.2, 2.75, -8.6)
+  ],
+  arena: [new THREE.Vector3(7, 8, 20), new THREE.Vector3(7, 8, -20)]
+}
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
 const coarse = window.matchMedia('(pointer: coarse)').matches
@@ -29,35 +40,41 @@ renderer.toneMappingExposure = 0.92
 document.body.appendChild(renderer.domElement)
 
 const scene = new THREE.Scene()
+scene.fog = new THREE.FogExp2(0x07070a, 0.012)
 
 const css = new CSS3DRenderer()
 css.setSize(window.innerWidth, window.innerHeight)
 document.getElementById('css3d').appendChild(css.domElement)
 
-const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 120)
+const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 220)
 
-const { colliders } = buildWorld(scene)
-buildLighting(scene)
-const videoWall = buildScreen(scene)
-const venue = createVenueSound(videoWall.iframe, [
-  new THREE.Vector3(12.2, 1.75, 8.6),
-  new THREE.Vector3(12.2, 2.75, 8.6),
-  new THREE.Vector3(12.2, 1.75, -8.6),
-  new THREE.Vector3(12.2, 2.75, -8.6)
-], videoWall.ligado)
+let colisor = createCollisionWorld([])
+const mundoColisor = {
+  query: (caixa, saida) => colisor.query(caixa, saida),
+  anyOverlap: (caixa, ignorar, tol) => colisor.anyOverlap(caixa, ignorar, tol),
+  get count() {
+    return colisor.count
+  }
+}
 
 const crowd = createCrowd(scene)
-const demo = new URLSearchParams(location.search).has('teste')
-const rotas = [
-  { id: 'teste-1', kind: 'et', centro: [4, 0, 3], raio: 3.5, velocidade: 0.5, fase: 0 },
-  { id: 'teste-2', kind: 'porco', centro: [-2, 0, -4], raio: 4, velocidade: 0.38, fase: 2 },
-  { id: 'teste-3', kind: 'et', centro: [15.5, 1.2, 0], raio: 2.6, velocidade: 0.6, fase: 4 }
-]
-if (demo) rotas.forEach((rota) => crowd.spawn(rota.id, rota.kind))
+const camera3 = createCamera(camera, mundoColisor)
+const player = createPlayer(mundoColisor, new THREE.Vector3(0, 0, 0))
+const touch = createTouchInput()
+const controls = createControls(camera, renderer.domElement, touch)
+const acoes = createAcoes(touch)
+controls.bloquearOlhar(acoes.aberta)
+const hud = createHud()
+const menu = createMenu(
+  (modo) => camera3.definir(modo),
+  () => controls.travar()
+)
 
 let eu = null
+let meuTipo = null
 
 function vestir(tipo) {
+  meuTipo = tipo
   if (eu) scene.remove(eu.root)
   eu = createAvatar(tipo)
   eu.root.visible = false
@@ -69,19 +86,55 @@ const sala = conectarSala(crowd, (tipo) => {
   vestir(tipo)
 })
 
-const world = createCollisionWorld(colliders)
-const camera3 = createCamera(camera, world)
-const player = createPlayer(world, new THREE.Vector3(-18, 0, 0))
-const touch = createTouchInput()
-const controls = createControls(camera, renderer.domElement, touch)
-const acoes = createAcoes(touch)
-controls.bloquearOlhar(acoes.aberta)
+let atual = null
+let venue = createVenueSound(null, [], false)
+let imune = true
 
-const menu = createMenu(
-  (modo) => camera3.definir(modo),
-  () => controls.travar()
-)
-const hud = createHud()
+function descartar(mundo) {
+  scene.remove(mundo.grupo)
+  mundo.grupo.traverse((no) => {
+    if (no.isMesh || no.isPoints) no.geometry.dispose()
+    if (no.element && no.element.parentNode) no.element.remove()
+  })
+}
+
+function entrar(nome) {
+  const receita = MUNDOS[nome] || MUNDOS.lobby
+  if (atual) descartar(atual.mundo)
+  const mundo = receita.construir()
+  scene.add(mundo.grupo)
+  atual = { nome: receita.nome, mundo, titulo: receita.titulo }
+
+  colisor = createCollisionWorld(mundo.colliders)
+  player.position.copy(mundo.spawn)
+  player.velocity.set(0, 0, 0)
+  controls.setAngles(mundo.olhar, -0.02)
+  scene.fog.color.setHex(receita.fundo)
+  scene.fog.density = nome === 'arena' ? 0.004 : 0.012
+
+  venue = mundo.telao
+    ? createVenueSound(mundo.telao.iframe, CAIXAS_DE_SOM[nome] || [], mundo.telao.ligado)
+    : createVenueSound(null, [], false)
+  venue.unlock()
+
+  imune = true
+  hud.sala(meuTipo ? `${receita.titulo} · você é o ${meuTipo}` : receita.titulo)
+  crowd.limpar()
+  renderer.shadowMap.needsUpdate = true
+}
+
+function olharPortais(caixaJogador) {
+  let dentro = false
+  for (const portal of atual.mundo.portais) {
+    if (!portal.caixa.intersectsBox(caixaJogador)) continue
+    dentro = true
+    if (!imune) {
+      entrar(portal.destino)
+      return
+    }
+  }
+  if (!dentro) imune = false
+}
 
 let entrou = false
 
@@ -116,8 +169,11 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
   css.setSize(window.innerWidth, window.innerHeight)
-renderer.setClearColor(0x07070a, 0)
+  renderer.setClearColor(0x07070a, 0)
 })
+
+entrar(new URLSearchParams(location.search).get('lugar') || 'lobby')
+if (!eu) vestir(SKIN_NAMES[Math.floor(Math.random() * SKIN_NAMES.length)])
 
 const warmUp = renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve()
 warmUp.catch(() => {}).then(() => {
@@ -125,6 +181,7 @@ warmUp.catch(() => {}).then(() => {
 })
 renderer.shadowMap.needsUpdate = true
 
+const caixaJogador = new THREE.Box3()
 let last = performance.now()
 
 function frame(now = performance.now()) {
@@ -132,6 +189,11 @@ function frame(now = performance.now()) {
   last = now
   const input = controls.sample(dt)
   player.update(dt, input, controls.forward, controls.right)
+
+  caixaJogador.min.set(player.position.x - 0.3, player.position.y, player.position.z - 0.3)
+  caixaJogador.max.set(player.position.x + 0.3, player.position.y + 1.8, player.position.z + 0.3)
+  olharPortais(caixaJogador)
+
   const { yaw, pitch } = controls.angulos()
   const andando = Math.hypot(player.velocity.x, player.velocity.z)
   if (eu) {
@@ -142,21 +204,9 @@ function frame(now = performance.now()) {
   }
   controls.apply()
   camera3.aplicar(player.position, PLAYER.eye, yaw, pitch)
-  if (demo) {
-    const t = performance.now() / 1000
-    for (const rota of rotas) {
-      const a = t * rota.velocidade + rota.fase
-      crowd.place(
-        rota.id,
-        rota.centro[0] + Math.cos(a) * rota.raio,
-        rota.centro[1],
-        rota.centro[2] + Math.sin(a) * rota.raio,
-        -a + Math.PI / 2
-      )
-    }
-  }
+
   if (input.forward !== 0 || input.strafe !== 0 || input.jump) acoes.andou()
-  sala.enviar(player.position, camera.rotation.y, acoes.atual())
+  sala.enviar(player.position, camera.rotation.y, acoes.atual(), atual.nome)
   crowd.update(dt)
   hud.tick(dt)
   venue.update(camera.position)
@@ -168,13 +218,25 @@ function frame(now = performance.now()) {
 
 frame()
 
-if (!eu) vestir(SKIN_NAMES[Math.floor(Math.random() * SKIN_NAMES.length)])
-
-window.game = { scene, camera, renderer, player, world, controls, videoWall, venue, crowd, sala, acoes, camera3, menu }
+window.game = {
+  scene,
+  camera,
+  renderer,
+  player,
+  controls,
+  crowd,
+  sala,
+  acoes,
+  camera3,
+  menu,
+  entrar,
+  lugar: () => atual.nome,
+  venue: () => venue
+}
 window.stats = () => ({
   drawCalls: renderer.info.render.calls,
   triangles: renderer.info.render.triangles,
-  colliders: world.count,
-  position: player.position.toArray().map((v) => +v.toFixed(2)),
-  onGround: player.isOnGround()
+  colliders: mundoColisor.count,
+  lugar: atual.nome,
+  position: player.position.toArray().map((v) => +v.toFixed(2))
 })
