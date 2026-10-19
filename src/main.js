@@ -24,7 +24,16 @@ const CAIXAS_DE_SOM = {
     new THREE.Vector3(12.2, 1.75, -8.6),
     new THREE.Vector3(12.2, 2.75, -8.6)
   ],
-  arena: [new THREE.Vector3(7, 8, 20), new THREE.Vector3(7, 8, -20)]
+  arena: [
+    new THREE.Vector3(8.5, 10, 27),
+    new THREE.Vector3(8.5, 10, -27),
+    new THREE.Vector3(23, 14, 0)
+  ]
+}
+
+const ALCANCE = {
+  casa: { perto: 5, longe: 46, piso: 0.18 },
+  arena: { perto: 34, longe: 150, piso: 0.45 }
 }
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
@@ -113,7 +122,7 @@ function entrar(nome) {
   scene.fog.density = nome === 'arena' ? 0.004 : 0.012
 
   venue = mundo.telao
-    ? createVenueSound(mundo.telao.iframe, CAIXAS_DE_SOM[nome] || [], mundo.telao.ligado)
+    ? createVenueSound(mundo.telao.iframe, CAIXAS_DE_SOM[nome] || [], mundo.telao.ligado, ALCANCE[nome])
     : createVenueSound(null, [], false)
   venue.unlock()
 
@@ -211,6 +220,7 @@ function frame(now = performance.now()) {
   hud.tick(dt)
   venue.update(camera.position)
   hud.soundState(venue.isReady(), venue.isOn())
+  hud.online(sala.online())
   renderer.render(scene, camera)
   css.render(scene, camera)
   requestAnimationFrame(frame)

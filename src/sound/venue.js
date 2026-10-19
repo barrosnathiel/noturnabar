@@ -1,7 +1,7 @@
-const NEAR = 5
-const FAR = 46
-
-export function createVenueSound(iframe, speakers, ligado = true) {
+export function createVenueSound(iframe, speakers, ligado = true, alcance = {}) {
+  const NEAR = alcance.perto ?? 5
+  const FAR = alcance.longe ?? 46
+  const PISO = alcance.piso ?? 0.18
   if (!ligado) {
     return {
       update: () => {},
@@ -79,9 +79,9 @@ export function createVenueSound(iframe, speakers, ligado = true) {
       if (distance < best) best = distance
     }
     if (best <= NEAR) return 1
-    if (best >= FAR) return 0.18
+    if (best >= FAR) return PISO
     const fade = 1 - (best - NEAR) / (FAR - NEAR)
-    return 0.18 + Math.pow(fade, 1.4) * 0.82
+    return PISO + Math.pow(fade, 1.4) * (1 - PISO)
   }
 
   function update(position) {

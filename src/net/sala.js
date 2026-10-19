@@ -6,11 +6,14 @@ const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
 export function conectarSala(crowd, aoEntrar) {
   const escolhida = new URLSearchParams(location.search).get('sala')
   const url = escolhida || (LOCAL ? '' : PADRAO)
-  if (!url) return { ativa: () => false, enviar: () => {}, status: () => 'sem servidor' }
+  if (!url) {
+    return { ativa: () => false, enviar: () => {}, status: () => 'sem servidor', online: () => 0 }
+  }
 
   let socket = null
   let meuId = null
   let meuLugar = 'lobby'
+  let online = 0
   let estado = 'conectando'
   let ultimoEnvio = 0
   const vistos = new Set()
@@ -56,6 +59,7 @@ export function conectarSala(crowd, aoEntrar) {
         return
       }
       if (dados.t !== 'estado') return
+      online = dados.jogadores.length + 1
 
       const presentes = new Set()
       for (const outro of dados.jogadores) {
@@ -78,6 +82,7 @@ export function conectarSala(crowd, aoEntrar) {
     const cair = () => {
       if (estado === 'casa cheia') return
       estado = 'reconectando'
+      online = 0
       for (const id of vistos) crowd.remove(id)
       vistos.clear()
       setTimeout(abrir, RECONEXAO)
@@ -111,5 +116,5 @@ export function conectarSala(crowd, aoEntrar) {
     )
   }
 
-  return { ativa: () => estado === 'na sala', enviar, status: () => estado }
+  return { ativa: () => estado === 'na sala', enviar, status: () => estado, online: () => online }
 }

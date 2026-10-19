@@ -142,6 +142,7 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - O cliente envia a própria posição no máximo 15 vezes por segundo; o servidor rebate o estado na mesma cadência, sempre sem o registro do próprio destinatário — por isso ninguém vê o próprio avatar.
 - `crowd.place` guarda a posição alvo e `crowd.update` interpola até lá, senão o movimento sairia aos pulos de pacote em pacote.
 - O yaw que trafega é o da câmera, que olha para -Z, mas os avatares são montados com o rosto para +Z. Por isso `crowd` soma meia volta ao aplicar a rotação. Sem isso todo mundo aparece de costas exatamente quando está de frente.
+- O contador de gente no canto conta a sala inteira, não só o lugar: é o tamanho da lista que o servidor manda mais o próprio jogador.
 - O lugar viaja junto com a posição e o cliente só mostra quem está no mesmo lugar. Sem isso, quem está na arena vê gente andando no vazio com as coordenadas da casa.
 - Posição com número não finito é descartada no servidor, quem fica 20 segundos sem mandar nada é desconectado, e a sala para em 40 pessoas.
 - `src/net/sala.js` tem a constante `PADRAO` com a URL do servidor; `?sala=ws://...` sobrescreve para testar local. Com a constante vazia o jogo roda sozinho, sem rede.
@@ -175,6 +176,7 @@ O menu tem dois modos, decididos pela duração do gesto. Segurou mais de 260ms,
 - O furo é um `MeshBasicMaterial` com `blending: NoBlending` **e `opacity: 0`**. Sem a opacidade zero ele escreve alpha 1 e pinta um retângulo preto opaco, que foi exatamente o primeiro sintoma. Com alpha 0 o canvas fica transparente ali e o iframe, que está numa camada abaixo, aparece.
 - Por isso o renderer precisa de `alpha: true`, `setClearColor(0x07070a, 0)` e `scene.background` nulo; o fundo preto vem do CSS do `body`.
 - O `CSS3DRenderer` fica em `#css3d` com `z-index: 0` e o canvas com `z-index: 1`. Geometria na frente do telão continua ocultando ele, porque é desenhada no WebGL por cima do furo.
+- O alcance do som é por mundo: na casa, 5m de volume cheio e 46m de limite; na arena, 34m e 150m, com piso mais alto. A curva da casa aplicada numa pista de 124m deixa tudo quase mudo, porque lá qualquer ponto já é longe.
 - `sound/venue.js` usa a IFrame API para o volume. O volume vem da distância até a caixa de som mais próxima, de 100 colado nela a 18 no limite de 46m. O player começa mudo porque autoplay com som é bloqueado. Todo clique, tecla e toque tenta `unMute`, e a tentativa só é dada por encerrada quando o player confirma que saiu do mudo.
 
 O volume é aplicado sempre que o player está pronto, sem depender de o som já ter sido ligado. `isMuted()` responde pelo estado em cache da IFrame API, que é alimentado por mensagem assíncrona: lido logo depois do `unMute()` ele ainda devolve o valor velho. Usar essa leitura como condição para aplicar volume deixava o player desmutado e em volume zero — vídeo rodando, silêncio. Hoje ela serve só para o aviso do HUD, com cache de 400ms.

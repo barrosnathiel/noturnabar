@@ -27,6 +27,21 @@ export function createHud() {
     helpEl.innerHTML = `<div class="t">CASA DE SHOW</div>${text}`
   }
 
+  const onlineEl = document.getElementById('online')
+  let ultimoOnline = -1
+
+  function online(total) {
+    if (!onlineEl) return
+    if (total === ultimoOnline) return
+    ultimoOnline = total
+    if (total < 1) {
+      onlineEl.style.display = 'none'
+      return
+    }
+    onlineEl.style.display = 'block'
+    onlineEl.textContent = total === 1 ? '1 na casa' : `${total} na casa`
+  }
+
   const soundEl = document.getElementById('sound')
   let lastSound = null
 
@@ -46,5 +61,5 @@ export function createHud() {
     salaEl.style.display = 'block'
   }
 
-  return { tick, dismissHelp, notice, soundState, sala }
+  return { tick, dismissHelp, notice, soundState, sala, online }
 }
