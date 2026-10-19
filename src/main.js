@@ -120,7 +120,7 @@ const FIGURANTES = Math.min(
   parseInt(new URLSearchParams(location.search).get('multidao') || '0', 10) || 0,
   800
 )
-const ESTILOS = ['balanco', 'maos', 'solto']
+const ESTILOS = ['balanco', 'maos', 'solto', 'jamal']
 
 function encherPista(nome) {
   if (!FIGURANTES) return
@@ -240,6 +240,7 @@ warmUp.catch(() => {}).then(() => {
 renderer.shadowMap.needsUpdate = true
 
 const caixaJogador = new THREE.Box3()
+let yawTravado = null
 let last = performance.now()
 
 function frame(now = performance.now()) {
@@ -254,17 +255,24 @@ function frame(now = performance.now()) {
 
   const { yaw, pitch } = controls.angulos()
   const andando = Math.hypot(player.velocity.x, player.velocity.z)
+  const acao = acoes.atual()
+  if (acao !== 'nada' && andando < 0.6) {
+    if (yawTravado === null) yawTravado = yaw
+  } else {
+    yawTravado = null
+  }
+  const yawCorpo = yawTravado === null ? yaw : yawTravado
   if (eu) {
     eu.root.visible = camera3.modo() === 'terceira'
     eu.root.position.copy(player.position)
-    eu.root.rotation.y = yaw + Math.PI
-    eu.update(dt, andando, acoes.atual())
+    eu.root.rotation.y = yawCorpo + Math.PI
+    eu.update(dt, andando, acao)
   }
   controls.apply()
   camera3.aplicar(player.position, PLAYER.eye, yaw, pitch)
 
   if (input.forward !== 0 || input.strafe !== 0 || input.jump) acoes.andou()
-  sala.enviar(player.position, camera.rotation.y, acoes.atual(), atual.nome)
+  sala.enviar(player.position, yawCorpo, acao, atual.nome)
   if (atual.mundo.animar) atual.mundo.animar(dt)
   crowd.update(dt)
   hud.tick(dt)

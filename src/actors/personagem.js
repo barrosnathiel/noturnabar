@@ -17,9 +17,11 @@ export const IDS = PERSONAGENS.map((p) => p.id)
 const ALTURA = 1.75
 const OSSOS = [
   'Hips', 'Torso', 'Abdomen', 'Head', 'Neck',
-  'UpperArm.L', 'LowerArm.L', 'UpperArm.R', 'LowerArm.R',
-  'UpperLeg.L', 'LowerLeg.L', 'UpperLeg.R', 'LowerLeg.R'
+  'UpperArmL', 'LowerArmL', 'UpperArmR', 'LowerArmR',
+  'UpperLegL', 'LowerLegL', 'UpperLegR', 'LowerLegR'
 ]
+
+const semPonto = (nome) => nome.replace(/\./g, '')
 
 const loader = new GLTFLoader()
 const cache = new Map()
@@ -54,6 +56,24 @@ function harmonicos(t, estilo) {
       joelhoE: 0.16, joelhoD: 0.16,
       incl: Math.sin(w * 0.5 * t) * 0.08, sobe: Math.max(0, Math.sin(w * t)) * 0.09,
       cabeca: Math.sin(w * t) * 0.14
+    }
+  }
+  if (estilo === 'jamal') {
+    const w = 6.4
+    const onda = Math.sin(w * t)
+    const marca = Math.tanh(onda * 2.4)
+    const passo = Math.max(0, onda)
+    const contra = Math.max(0, -onda)
+    return {
+      bracoE: 0.12 + passo * 1.32, bracoD: 0.12 + contra * 1.32,
+      abreE: -0.16 - passo * 0.3, abreD: 0.16 + contra * 0.3,
+      anteE: 0.35 + passo * 1.15, anteD: 0.35 + contra * 1.15,
+      pernaE: passo * 0.62 - contra * 0.16,
+      pernaD: contra * 0.62 - passo * 0.16,
+      joelhoE: -passo * 0.55,
+      joelhoD: -contra * 0.55,
+      incl: marca * 0.16, sobe: Math.abs(onda) * 0.05,
+      cabeca: marca * 0.12
     }
   }
   if (estilo === 'solto') {
@@ -99,9 +119,11 @@ export function criarPersonagem(modelo) {
   const ossos = {}
   const base = {}
   corpo.traverse((no) => {
-    if (!no.isBone || !OSSOS.includes(no.name)) return
-    ossos[no.name] = no
-    base[no.name] = { quat: no.quaternion.clone(), y: no.position.y }
+    if (!no.isBone) return
+    const chave = semPonto(no.name)
+    if (!OSSOS.includes(chave)) return
+    ossos[chave] = no
+    base[chave] = { quat: no.quaternion.clone(), y: no.position.y }
   })
 
   const mixer = new THREE.AnimationMixer(corpo)
@@ -126,24 +148,32 @@ export function criarPersonagem(modelo) {
   const giro = new THREE.Quaternion()
   const euler = new THREE.Euler()
 
-  function poe(nome, x, z = 0) {
+  function poe(nome, x, z = 0, y = 0) {
     const osso = ossos[nome]
     if (!osso) return
-    euler.set(x, 0, z)
+    euler.set(x, y, z)
     giro.setFromEuler(euler)
     osso.quaternion.copy(base[nome].quat).multiply(giro)
   }
 
+  function poeNoPai(nome, x, y = 0, z = 0) {
+    const osso = ossos[nome]
+    if (!osso) return
+    euler.set(x, y, z)
+    giro.setFromEuler(euler)
+    osso.quaternion.copy(base[nome].quat).premultiply(giro)
+  }
+
   function dancar(t, estilo) {
     const p = harmonicos(t, estilo)
-    poe('UpperArm.L', p.bracoE, p.abreE)
-    poe('UpperArm.R', p.bracoD, p.abreD)
-    poe('LowerArm.L', p.anteE)
-    poe('LowerArm.R', p.anteD)
-    poe('UpperLeg.L', p.pernaE)
-    poe('UpperLeg.R', p.pernaD)
-    poe('LowerLeg.L', p.joelhoE)
-    poe('LowerLeg.R', p.joelhoD)
+    poe('UpperArmL', p.bracoE, p.abreE)
+    poe('UpperArmR', p.bracoD, p.abreD)
+    poe('LowerArmL', p.anteE)
+    poe('LowerArmR', p.anteD)
+    poeNoPai('UpperLegL', p.pernaE)
+    poeNoPai('UpperLegR', p.pernaD)
+    poeNoPai('LowerLegL', p.joelhoE)
+    poeNoPai('LowerLegR', p.joelhoD)
     poe('Torso', 0, p.incl)
     poe('Head', 0, p.cabeca)
     if (ossos.Hips) ossos.Hips.position.y = base.Hips.y + p.sobe / modelo.escala

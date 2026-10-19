@@ -1,4 +1,4 @@
-const ESTILOS = ['balanco', 'maos', 'solto']
+const ESTILOS = ['balanco', 'maos', 'solto', 'jamal']
 
 export function createAcoes(touch) {
   const roda = document.getElementById('roda')
@@ -26,7 +26,7 @@ export function createAcoes(touch) {
     const distancia = Math.hypot(dx, dy)
     if (distancia < 26) alvo = 'nada'
     else if (Math.abs(dx) > Math.abs(dy)) alvo = dx < 0 ? 'balanco' : 'solto'
-    else alvo = dy < 0 ? 'maos' : 'nada'
+    else alvo = dy < 0 ? 'maos' : 'jamal'
     for (const op of opcoes) op.classList.toggle('sel', op.dataset.a === alvo)
   }
 
@@ -85,7 +85,7 @@ export function createAcoes(touch) {
   })
 
   window.addEventListener('keydown', (evento) => {
-    const indice = ['Digit1', 'Digit2', 'Digit3'].indexOf(evento.code)
+    const indice = ['Digit1', 'Digit2', 'Digit3', 'Digit4'].indexOf(evento.code)
     if (indice >= 0) definir(ESTILOS[indice])
     if (evento.code === 'Escape' && aberta) {
       fechar(false)

@@ -6,7 +6,7 @@ const TICK = 1000 / 15
 const LIMITE = 40
 const SILENCIO = 20000
 const TIPOS = ['Alien', 'Cactoro', 'Yeti', 'Ninja', 'Frog', 'Dino', 'Orc', 'Bunny']
-const ACOES = ['nada', 'balanco', 'maos', 'solto']
+const ACOES = ['nada', 'balanco', 'maos', 'solto', 'jamal']
 const LUGARES = ['lobby', 'casa', 'arena']
 
 const jogadores = new Map()

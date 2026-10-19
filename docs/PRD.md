@@ -83,6 +83,8 @@ Toda mudança pedida passa por uma pergunta: está na lista "Dentro"? Se não es
 
 **19/10/2026 — céu da arena.** Entrou um cometa cruzando devagar (82s de travessia, 30s de pausa) e quatro naves do pacote Ultimate Spaceships (CC0, Quaternius) em órbitas lentas sobre a arena, com brilho nos motores. Tudo cenário: não colide, não interage, só existe no céu. O far da câmera subiu de 220 para 460 pra caber a órbita. Alinhado ao telão e logo acima dele flutua o letreiro Rock in the Sky: texto cursivo (Pacifico) em canvas, com "Rock in the" em vermelho e "Sky" em azul, ambos com glow, e abaixo dele uma lua com a silhueta de guitarra do Font Awesome Free (ícones em CC BY 4.0) na frente.
 
+**19/10/2026 — passinho do Jamal.** Quarta dança, tirada de um gif de referência: antebraços rodando na frente do peito e troca rápida de pés. Entra na roda (para baixo), na tecla 4, na barra do celular e no sorteio da multidão. No caminho apareceu um bug antigo: os nomes dos ossos na lista eram `UpperArm.L` e os modelos atuais usam `UpperArmL`, então as danças só mexiam tronco, cabeça e quadril. Corrigido — as quatro agora animam braços e pernas de verdade. Enquanto o jogador dança, o corpo para de acompanhar a mira: o boneco fica fixo e a câmera de terceira pessoa orbita em volta, pra dar pra ver a dança de frente.
+
 ## Verificação da v1 (18/10/2026)
 
 Passou, verificado automaticamente no navegador:
