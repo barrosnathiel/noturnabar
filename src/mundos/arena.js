@@ -622,7 +622,9 @@ export const arena = {
           altura: 8.4,
           centro: new THREE.Vector3(31.4, 9.6, lado),
           moldura: 0.8,
-          brilho: 340
+          brilho: 340,
+          pixels: 426,
+          leve: true
         })
       )
     }

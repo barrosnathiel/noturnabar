@@ -55,6 +55,7 @@ export function sincronizarTelas(mestre, telas = []) {
       if (!Number.isFinite(base) || base <= 0) continue
       const agora = tempos.get(iframe)
       if (agora === undefined) {
+        manda(iframe, 'setPlaybackQuality', ['small'])
         manda(iframe, 'seekTo', [base + ADIANTE, true])
         manda(iframe, 'playVideo')
         continue
