@@ -126,8 +126,11 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 ## Modelos externos
 
 - `public/modelos/` tem quatro peças do Sci-Fi Essentials Kit do Quaternius (CC0): antena parabólica, dois caixotes e um barril. São os únicos arquivos de arte do projeto.
-- As texturas do kit foram deixadas de fora de propósito: só as três "trim" compartilhadas somam 15MB, contra 555KB do jogo inteiro. As referências de textura foram removidas dos `.gltf`, senão o carregador pede os arquivos e enche o console de 404. Cada peça é pintada com material nosso, o que também mantém o visual flat do resto.
-- `mundos/modelos.js` carrega, funde a malha numa geometria só, centra na base e devolve para `espalhar`, que monta um `InstancedMesh`. Por isso dezenas de caixotes custam um draw call.
+- Só as texturas de cor entram, reduzidas para 512px em JPEG: as quatro somam 189KB. As originais em PNG somam 15MB contra 555KB do jogo inteiro, com as ORM em 3MB cada. Mapas de normal e de rugosidade ficaram de fora, porque com esta iluminação e a essa distância não compensam o peso.
+- O modelo pede variantes `_Red` das texturas de trim que só existem na versão paga do kit; o script cai para a versão sem sufixo.
+- As referências que sobram no `.gltf` precisam apontar para os arquivos que existem, senão o carregador pede os PNGs e enche o console de 404.
+- `mundos/modelos.js` funde a malha **por material**, não numa só: mergear tudo perderia qual textura vai em qual parte. Cada grupo vira um `InstancedMesh`, então dezenas de caixotes custam um draw call por material.
+- O atributo `uv` precisa sobreviver ao merge. Eu descartava todos os atributos menos posição e normal, e sem uv a textura não aparece em lugar nenhum.
 - O carregamento é assíncrono e o mundo é construído de forma síncrona: os adereços entram quando chegam, e a função confere se o grupo ainda está na cena antes de adicionar, senão enfeita um mundo que o jogador já deixou.
 
 ## Mundos

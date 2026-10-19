@@ -86,7 +86,7 @@ async function adornar(grupo) {
   if (!grupo.parent) return
 
   if (antena) {
-    grupo.add(espalhar(antena, MAT.casco, [
+    grupo.add(espalhar(antena, [
       { x: -118, z: -64, escala: 9, giro: 0.5 },
       { x: -96, z: 78, escala: 7, giro: -0.9 },
       { x: 62, z: -82, escala: 8, giro: 2.3 },
@@ -106,8 +106,8 @@ async function adornar(grupo) {
     if (i % 3 !== 1) pilhas.push({ ...base, z: lado * 68, escala: 2.4, giro: i * 0.3 })
     if (i % 4 === 0) tampados.push({ x: x + 4, z: lado * 65, escala: 2.8, giro: i * 0.2 })
   }
-  if (caixa) grupo.add(espalhar(caixa, MAT.carga, pilhas))
-  if (lona) grupo.add(espalhar(lona, MAT.carga, tampados))
+  if (caixa) grupo.add(espalhar(caixa, pilhas))
+  if (lona) grupo.add(espalhar(lona, tampados))
 
   if (barril) {
     const tambores = []
@@ -120,7 +120,7 @@ async function adornar(grupo) {
         giro: i * 0.7
       })
     }
-    grupo.add(espalhar(barril, MAT.tambor, tambores))
+    grupo.add(espalhar(barril, tambores))
   }
 }
 
@@ -200,6 +200,15 @@ export const arena = {
 
     skyline(grupo)
     adornar(grupo)
+
+    for (let i = 0; i < 5; i++) {
+      const x = -78 + i * 26
+      for (const lado of [-1, 1]) {
+        const poste = new THREE.PointLight(0xffd9a0, 300, 34, 1.8)
+        poste.position.set(x, 7.5, lado * 60)
+        grupo.add(poste)
+      }
+    }
 
     const estrelas = new THREE.BufferGeometry()
     const pontos = []
