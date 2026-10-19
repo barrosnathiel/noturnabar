@@ -56,7 +56,7 @@ const css = new CSS3DRenderer()
 css.setSize(window.innerWidth, window.innerHeight)
 document.getElementById('css3d').appendChild(css.domElement)
 
-const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 220)
+const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 460)
 
 let colisor = createCollisionWorld([])
 const mundoColisor = {

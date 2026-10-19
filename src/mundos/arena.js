@@ -96,6 +96,109 @@ function astros(grupo) {
   grupo.add(lua)
 }
 
+function cometa(grupo) {
+  const corpo = new THREE.Group()
+  corpo.frustumCulled = false
+
+  const nucleoMat = new THREE.MeshBasicMaterial({ color: 0xeaf4ff, transparent: true, opacity: 1, fog: false })
+  const nucleo = new THREE.Mesh(new THREE.SphereGeometry(4.2, 18, 12), nucleoMat)
+  corpo.add(nucleo)
+
+  const haloMat = new THREE.MeshBasicMaterial({
+    color: 0x8fc2ff,
+    transparent: true,
+    opacity: 0.34,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: false
+  })
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(12, 18, 12), haloMat)
+  corpo.add(halo)
+
+  const caudas = []
+  for (const [comprimento, raio, forca, alpha] of [[120, 4.6, 2.4, 0.42], [210, 11, 1.6, 0.12]]) {
+    const g = new THREE.ConeGeometry(raio, comprimento, 14, 1, true)
+    g.translate(0, -comprimento / 2, 0)
+    g.rotateX(-Math.PI / 2)
+    const pos = g.attributes.position
+    const cores = new Float32Array(pos.count * 3)
+    for (let i = 0; i < pos.count; i++) {
+      const t = Math.min(Math.max(pos.getZ(i) / comprimento, 0), 1)
+      const f = Math.pow(1 - t, forca)
+      cores[i * 3] = 0.68 * f
+      cores[i * 3 + 1] = 0.84 * f
+      cores[i * 3 + 2] = 1 * f
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(cores, 3))
+    const mat = new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: alpha,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      fog: false
+    })
+    const cauda = new THREE.Mesh(g, mat)
+    cauda.frustumCulled = false
+    corpo.add(cauda)
+    caudas.push({ mat, alpha })
+  }
+
+  const poeira = new THREE.BufferGeometry()
+  const graos = []
+  for (let i = 0; i < 140; i++) {
+    const t = Math.pow(Math.random(), 0.7)
+    const raio = (1 + t * 9) * Math.sqrt(Math.random())
+    const a = Math.random() * Math.PI * 2
+    graos.push(Math.cos(a) * raio, Math.sin(a) * raio, t * 200)
+  }
+  poeira.setAttribute('position', new THREE.Float32BufferAttribute(graos, 3))
+  const poMat = new THREE.PointsMaterial({
+    color: 0xd6e8ff,
+    size: 2,
+    sizeAttenuation: false,
+    transparent: true,
+    opacity: 0.5,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: false
+  })
+  const po = new THREE.Points(poeira, poMat)
+  po.frustumCulled = false
+  corpo.add(po)
+
+  grupo.add(corpo)
+
+  const inicio = new THREE.Vector3(196, 152, -236)
+  const fim = new THREE.Vector3(-58, 104, 246)
+  const rumo = new THREE.Vector3().subVectors(fim, inicio).normalize()
+  const travessia = 82
+  const espera = 30
+  const alvo = new THREE.Vector3()
+  let tempo = -6
+
+  return (dt) => {
+    tempo += dt
+    if (tempo > travessia + espera) tempo -= travessia + espera
+    if (tempo < 0 || tempo > travessia) {
+      corpo.visible = false
+      return
+    }
+    corpo.visible = true
+    const t = tempo / travessia
+    corpo.position.lerpVectors(inicio, fim, t)
+    alvo.copy(corpo.position).add(rumo)
+    corpo.lookAt(alvo)
+    const borda = Math.min(t, 1 - t) / 0.12
+    const vis = borda >= 1 ? 1 : borda * borda * (3 - 2 * borda)
+    nucleoMat.opacity = vis
+    haloMat.opacity = 0.3 * vis
+    for (const { mat, alpha } of caudas) mat.opacity = alpha * vis
+    poMat.opacity = 0.5 * vis
+  }
+}
+
 function skyline(grupo) {
   const blocos = []
   const balizas = []
@@ -271,6 +374,7 @@ export const arena = {
     grupo.add(pista)
 
     astros(grupo)
+    const moverCometa = cometa(grupo)
     skyline(grupo)
     adornar(grupo)
     const voadores = []
@@ -279,6 +383,7 @@ export const arena = {
 
     function animar(dt) {
       relogio += dt
+      moverCometa(dt)
       for (const { objeto, mixer, rota } of voadores) {
         mixer.update(dt)
         const a = relogio * rota.giro + rota.fase
