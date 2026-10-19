@@ -329,6 +329,7 @@ async function levantarFrota(grupo, frota) {
     if (!partes || !grupo.parent) return
     const nave = new THREE.Group()
     for (const parte of partes) {
+      if (parte.material.map) parte.material.map.anisotropy = 8
       parte.material.emissive = new THREE.Color(0xffffff)
       parte.material.emissiveMap = parte.material.map
       parte.material.emissiveIntensity = 0.5
