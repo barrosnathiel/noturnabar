@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3491
 const TICK = 1000 / 15
 const LIMITE = 40
 const SILENCIO = 20000
-const TIPOS = ['et', 'porco']
+const TIPOS = ['Alien', 'Cactoro', 'Yeti', 'Ninja', 'Cat', 'Dog', 'Wizard', 'Mushnub']
 const ACOES = ['nada', 'balanco', 'maos', 'solto']
 const LUGARES = ['lobby', 'casa', 'arena']
 
@@ -56,6 +56,16 @@ wss.on('connection', (socket) => {
     try {
       dados = JSON.parse(raw)
     } catch (erro) {
+      return
+    }
+    if (dados.t === 'sou') {
+      const alvo = jogadores.get(id)
+      if (alvo && TIPOS.includes(dados.tipo)) {
+        alvo.jogador.tipo = dados.tipo
+        for (const { socket: outro, jogador: dono } of jogadores.values()) {
+          if (dono.id !== id) envia(outro, { t: 'entrou', jogador: alvo.jogador })
+        }
+      }
       return
     }
     if (dados.t !== 'pos') return

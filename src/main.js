@@ -8,9 +8,10 @@ import { createAcoes } from './player/acoes.js'
 import { createHud } from './hud/index.js'
 import { createVenueSound } from './sound/venue.js'
 import { createCrowd } from './actors/crowd.js'
-import { createAvatar, SKIN_NAMES } from './actors/avatar.js'
+import { carregarPersonagem, criarPersonagem, IDS } from './actors/personagem.js'
 import { createCamera } from './player/camera.js'
 import { createMenu } from './player/menu.js'
+import { createSelecao } from './player/selecao.js'
 import { conectarSala } from './net/sala.js'
 import { lobby } from './mundos/lobby.js'
 import { casa } from './mundos/casa.js'
@@ -84,15 +85,35 @@ let meuTipo = null
 
 function vestir(tipo) {
   meuTipo = tipo
-  if (eu) scene.remove(eu.root)
-  eu = createAvatar(tipo)
-  eu.root.visible = false
-  scene.add(eu.root)
+  if (eu) {
+    scene.remove(eu.root)
+    eu = null
+  }
+  carregarPersonagem(tipo).then((modelo) => {
+    if (!modelo || meuTipo !== tipo) return
+    eu = criarPersonagem(modelo)
+    eu.root.visible = camera3.modo() === 'terceira'
+    scene.add(eu.root)
+  })
 }
 
-const sala = conectarSala(crowd, (tipo) => {
-  hud.sala(`você é o ${tipo}`)
-  vestir(tipo)
+let sala = {
+  ativa: () => false,
+  enviar: () => {},
+  status: () => 'escolhendo',
+  online: () => 0
+}
+
+createSelecao((escolhido) => {
+  vestir(escolhido)
+  sala = conectarSala(
+    crowd,
+    (tipo) => {
+      vestir(tipo)
+      hud.sala(atual ? `${atual.titulo} · ${tipo}` : tipo)
+    },
+    escolhido
+  )
 })
 
 const FIGURANTES = Math.min(
@@ -108,7 +129,7 @@ function encherPista(nome) {
   const centro = nome === 'arena' ? -22 : 2
   for (let i = 0; i < FIGURANTES; i++) {
     const id = `figurante-${i}`
-    crowd.spawn(id, i % 2 ? 'et' : 'porco')
+    crowd.spawn(id, IDS[i % IDS.length])
     const a = Math.random() * Math.PI * 2
     const r = perto + Math.random() * (longe - perto)
     crowd.place(
@@ -210,7 +231,7 @@ window.addEventListener('resize', () => {
 })
 
 entrar(new URLSearchParams(location.search).get('lugar') || 'lobby')
-if (!eu) vestir(SKIN_NAMES[Math.floor(Math.random() * SKIN_NAMES.length)])
+
 
 const warmUp = renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve()
 warmUp.catch(() => {}).then(() => {

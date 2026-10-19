@@ -170,12 +170,22 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 - Clicar no fundo escuro do menu também retoma; clicar dentro da caixa não, senão escolher a câmera fecharia o menu junto. Abrir só depois da primeira entrada, senão ele aparece na carga da página. No celular, onde não existe ESC, há um botão MENU no topo.
 - A escolha de câmera fica em `localStorage`; toda leitura e escrita vai em try/catch porque em janela anônima o acesso pode lançar.
 
-## Avatares
+## Personagens
+
+- `actors/personagem.js` carrega cada criatura de `public/modelos/personagens/`. São glTF autocontidos: geometria, esqueleto, animações e textura num arquivo só, entre 121 e 305KB.
+- A escala é calculada no carregamento, pela altura da bounding box, para todos ficarem com 1,75m. Os modelos vêm em tamanhos bem diferentes entre si.
+- O estado vira animação em `update`: parado é Idle, andando é Walk com `timeScale` proporcional à velocidade, dançando é Dance. A troca usa `fadeIn`/`fadeOut` de 0,25s, senão o personagem salta de uma pose para outra.
+- `player/selecao.js` é a tela de escolha, com cena e renderer próprios num canvas pequeno. Carrega um personagem por vez, conforme você navega, em vez de baixar os oito de uma vez. Ao confirmar, o canvas sai da página e o renderer é descartado — dois contextos WebGL vivos ao mesmo tempo custam caro.
+- O tipo escolhido vai para o servidor numa mensagem `sou` logo após conectar; antes o servidor sorteava e o jogador não tinha voz.
+
+## Avatares antigos (removidos)
 
 - `actors/avatar.js` monta os dois tipos com primitivas e devolve `root` mais um `update(dt, speed)`. Geometrias e materiais ficam em cache por tipo, então o segundo ET não recria nada.
 - A animação é um ciclo de caminhada simples: pernas e braços oscilam em torno dos pivôs com amplitude proporcional à velocidade, mais um sobe-e-desce do tronco. Com velocidade zero ele para em pé.
 - O ET tem passo longo e o porco passo curto (`stride` em cada skin), que é o que faz os dois andarem diferente sem animação própria.
 - `actors/crowd.js` guarda quem está na sala, interpola posição e ângulo entre as atualizações que chegam da rede e aplica o `update` de cada um. É ele que a camada de rede vai alimentar.
+Esta seção descreve o ET e o porco procedurais, que foram substituídos pelos modelos com esqueleto. Fica como registro do que já foi tentado.
+
 - Braço e perna têm dois segmentos cada, com uma esfera centrada no pivô da dobra. É ela que fecha a junta quando o cotovelo e o joelho dobram; sem a esfera abre fresta e o membro lê como duas peças encaixadas.
 - Tentei antes uma malha única com esqueleto (`SkinnedMesh`) e ficou pior: o corpo é um conjunto de peças sobrepostas, e ao deformar cada peça entorta por conta própria e elas se atravessam. Skinning aqui só valeria com uma casca contínua de verdade; `actors/corpo.js` guarda os helpers de geometria que sobraram dessa tentativa.
 - Medição de carga: 500 figurantes dançando na arena deram 60fps, 1.625 draw calls e 1,4 milhão de triângulos, sem nenhum quadro perdido, num M5. A curva é linear e não houve degrau: 25, 50, 100, 200, 350 e 500 renderizaram todos a 60. O limite prático é outro, de rede e de celular, não de renderização no desktop.

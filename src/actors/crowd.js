@@ -1,60 +1,73 @@
 import * as THREE from 'three'
-import { createAvatar, SKIN_NAMES } from './avatar.js'
+import { carregarPersonagem, criarPersonagem, IDS } from './personagem.js'
+
+const sorteado = () => IDS[Math.floor(Math.random() * IDS.length)]
 
 export function createCrowd(scene) {
   const people = new Map()
 
-  function spawn(id, kind = SKIN_NAMES[Math.floor(Math.random() * SKIN_NAMES.length)]) {
-    if (people.has(id)) return people.get(id)
-    const avatar = createAvatar(kind)
-    const person = {
-      avatar,
+  function spawn(id, tipo = sorteado()) {
+    let pessoa = people.get(id)
+    if (pessoa) return pessoa
+    pessoa = {
+      tipo,
+      avatar: null,
       target: new THREE.Vector3(),
       previous: new THREE.Vector3(),
       yaw: 0,
       targetYaw: 0,
       speed: 0,
-      acao: 'nada'
+      acao: 'nada',
+      vivo: true
     }
-    scene.add(avatar.root)
-    people.set(id, person)
-    return person
+    people.set(id, pessoa)
+    carregarPersonagem(tipo).then((modelo) => {
+      if (!modelo || !pessoa.vivo) return
+      pessoa.avatar = criarPersonagem(modelo)
+      pessoa.avatar.root.position.copy(pessoa.target)
+      scene.add(pessoa.avatar.root)
+    })
+    return pessoa
   }
 
   function place(id, x, y, z, yaw, acao = 'nada') {
-    const person = people.get(id) || spawn(id)
-    person.acao = acao
-    person.previous.copy(person.target)
-    person.target.set(x, y, z)
-    person.targetYaw = yaw
-    const delta = person.target.distanceTo(person.previous)
-    person.speed = delta / 0.1
+    const pessoa = people.get(id) || spawn(id)
+    pessoa.acao = acao
+    pessoa.previous.copy(pessoa.target)
+    pessoa.target.set(x, y, z)
+    pessoa.targetYaw = yaw
+    pessoa.speed = pessoa.target.distanceTo(pessoa.previous) / 0.1
   }
 
   function remove(id) {
-    const person = people.get(id)
-    if (!person) return
-    scene.remove(person.avatar.root)
+    const pessoa = people.get(id)
+    if (!pessoa) return
+    pessoa.vivo = false
+    if (pessoa.avatar) scene.remove(pessoa.avatar.root)
     people.delete(id)
   }
 
-  function update(dt) {
-    for (const person of people.values()) {
-      const root = person.avatar.root
-      root.position.lerp(person.target, Math.min(1, dt * 9))
-      let diff = person.targetYaw - person.yaw
-      while (diff > Math.PI) diff -= Math.PI * 2
-      while (diff < -Math.PI) diff += Math.PI * 2
-      person.yaw += diff * Math.min(1, dt * 9)
-      root.rotation.y = person.yaw + Math.PI
-      person.avatar.update(dt, person.speed, person.acao)
-      person.speed *= Math.max(0, 1 - dt * 3)
+  function limpar() {
+    for (const pessoa of people.values()) {
+      pessoa.vivo = false
+      if (pessoa.avatar) scene.remove(pessoa.avatar.root)
     }
+    people.clear()
   }
 
-  function limpar() {
-    for (const pessoa of people.values()) scene.remove(pessoa.avatar.root)
-    people.clear()
+  function update(dt) {
+    for (const pessoa of people.values()) {
+      if (!pessoa.avatar) continue
+      const root = pessoa.avatar.root
+      root.position.lerp(pessoa.target, Math.min(1, dt * 9))
+      let diff = pessoa.targetYaw - pessoa.yaw
+      while (diff > Math.PI) diff -= Math.PI * 2
+      while (diff < -Math.PI) diff += Math.PI * 2
+      pessoa.yaw += diff * Math.min(1, dt * 9)
+      root.rotation.y = pessoa.yaw + Math.PI
+      pessoa.avatar.update(dt, pessoa.speed, pessoa.acao)
+      pessoa.speed *= Math.max(0, 1 - dt * 3)
+    }
   }
 
   return { spawn, place, remove, update, limpar, count: () => people.size }

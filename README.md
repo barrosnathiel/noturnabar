@@ -55,7 +55,7 @@ Para encher a pista de figurantes dançando: `?multidao=500` (vai até 800). Ele
 
 ## Multiplayer
 
-Quem entra ganha um avatar sorteado entre um ET e um porco, e vê os outros andando pela casa. A sala é um servidor Node com WebSocket em `server/`, publicado em https://noturnabar.onrender.com — ele hiberna sem tráfego, então a primeira conexão depois de um tempo parado leva até um minuto para acordar.
+Antes de entrar você escolhe o personagem numa tela de seleção, entre oito criaturas com animação própria. Dentro do jogo você vê os outros jogadores andando e dançando pela casa. A sala é um servidor Node com WebSocket em `server/`, publicado em https://noturnabar.onrender.com — ele hiberna sem tráfego, então a primeira conexão depois de um tempo parado leva até um minuto para acordar.
 
 Para rodar a sala localmente: `npm start` dentro de `server/`, e abrir o jogo com `?sala=ws://localhost:3491`.
 
@@ -69,7 +69,10 @@ O fundo do palco tem um telão tocando vídeo, e o volume acompanha a sua distâ
 
 ## Créditos
 
-Quase tudo é geometria gerada em código. As exceções são quatro peças de cenário da arena (antena, caixotes e barril) do [Sci-Fi Essentials Kit](https://quaternius.com/packs/scifiessentialskit.html) do Quaternius, em CC0, usadas sem as texturas originais.
+Os cenários são geometria gerada em código. Os modelos vêm de dois pacotes CC0 do Quaternius:
+
+- [Sci-Fi Essentials Kit](https://quaternius.com/packs/scifiessentialskit.html) — antena, caixotes, barril e o drone da arena
+- Ultimate Monsters — as oito criaturas jogáveis
 
 ## Stack
 

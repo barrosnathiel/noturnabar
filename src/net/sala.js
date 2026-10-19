@@ -3,7 +3,7 @@ const RECONEXAO = 4000
 
 const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)
 
-export function conectarSala(crowd, aoEntrar) {
+export function conectarSala(crowd, aoEntrar, tipoEscolhido) {
   const escolhida = new URLSearchParams(location.search).get('sala')
   const url = escolhida || (LOCAL ? '' : PADRAO)
   if (!url) {
@@ -24,6 +24,7 @@ export function conectarSala(crowd, aoEntrar) {
 
     socket.onopen = () => {
       estado = 'na sala'
+      if (tipoEscolhido) socket.send(JSON.stringify({ t: 'sou', tipo: tipoEscolhido }))
     }
 
     socket.onmessage = (evento) => {
@@ -35,7 +36,7 @@ export function conectarSala(crowd, aoEntrar) {
       }
       if (dados.t === 'bemvindo') {
         meuId = dados.id
-        aoEntrar(dados.tipo)
+        aoEntrar(tipoEscolhido || dados.tipo)
         for (const outro of dados.outros) {
           if ((outro.lugar || 'lobby') !== meuLugar) continue
           crowd.spawn(outro.id, outro.tipo)

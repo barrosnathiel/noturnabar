@@ -43,7 +43,9 @@ O que continua fora no celular: gamepad, giroscópio, vibração e qualquer ajus
 
 **18/10/2026 — telão e som entram na v1.** Um telão no fundo do palco toca um vídeo do YouTube, e o volume acompanha a distância do jogador até as caixas de som.
 
-**18/10/2026 — multiplayer básico entra na v1.** Quem entra ganha um avatar sorteado entre dois, um ET e um porco bípede, e vê os outros andando pela casa. Nada além disso: sem voz, sem texto, sem nome em cima da cabeça, sem interação entre jogadores.
+**18/10/2026 — multiplayer básico entra na v1.** Quem entra escolhe o personagem numa tela antes do jogo e vê os outros andando pela casa.
+
+O ET e o porco feitos à mão saíram. No lugar entraram oito criaturas do Ultimate Monsters do Quaternius (CC0), que trazem esqueleto e animações próprias de parado, andar e dançar. A troca foi feita porque animação de animador resolve o que as minhas fórmulas não alcançavam, e porque esses modelos já vêm com a dança pronta. Nada além disso: sem voz, sem texto, sem nome em cima da cabeça, sem interação entre jogadores.
 
 O front continua estático na Vercel e a sala vira um processo Node com WebSocket no Render. Sem a variável do servidor configurada, o jogo roda sozinho como antes.
 
