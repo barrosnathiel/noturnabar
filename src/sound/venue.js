@@ -8,7 +8,8 @@ export function createVenueSound(iframe, speakers, ligado = true, alcance = {}) 
       unlock: () => {},
       isReady: () => false,
       isOn: () => false,
-      volumeFor: () => 0
+      volumeFor: () => 0,
+      tempo: () => NaN
     }
   }
 
@@ -96,5 +97,21 @@ export function createVenueSound(iframe, speakers, ligado = true, alcance = {}) 
     }
   }
 
-  return { update, unlock, isReady: () => ready, isOn, volumeFor: (position) => Math.round(loudness(position) * 100) }
+  function tempo() {
+    if (!ready) return NaN
+    try {
+      return player.getCurrentTime()
+    } catch (error) {
+      return NaN
+    }
+  }
+
+  return {
+    update,
+    unlock,
+    isReady: () => ready,
+    isOn,
+    tempo,
+    volumeFor: (position) => Math.round(loudness(position) * 100)
+  }
 }
