@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { createBuilder } from '../world/builder.js'
 import { materials as M } from '../world/materials.js'
+import { letreiro } from '../world/letreiro.js'
 
 const RAIO = 11
 
@@ -65,6 +66,11 @@ export const lobby = {
       vao.position.copy(moldura.position)
       vao.quaternion.copy(moldura.quaternion)
       grupo.add(vao)
+
+      const placa = letreiro(def.rotulo, `#${def.cor.toString(16).padStart(6, '0')}`, 3.4)
+      placa.position.set(x * 0.93, 2.45, z * 0.93)
+      placa.rotation.y = -def.angulo - Math.PI / 2
+      grupo.add(placa)
 
       const luz = new THREE.PointLight(def.cor, 240, 14, 1.6)
       luz.position.set(x * 0.82, 1.6, z * 0.82)

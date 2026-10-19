@@ -125,6 +125,8 @@ Orçamento fixo: no máximo 4 luzes projetando sombra. O resto não projeta.
 
 ## Mundos
 
+- Nome do portal é um `CanvasTexture`: o texto é desenhado num canvas e vira plano com transparência. Evita carregar fonte 3D ou arquivo externo, e fica nítido de perto.
+
 - Cada lugar é um módulo em `mundos/` com `construir()`, que devolve o grupo, os colisores, o spawn, o telão e os portais. Nada é adicionado à cena direto: tudo pendura num `Group`, que é o que permite descartar o mundo inteiro de uma vez.
 - O colisor é trocado a quente. `main` guarda um wrapper que delega para o mundo atual, então o jogador e a câmera seguem apontando para o mesmo objeto a vida toda.
 - Ao descartar, as geometrias são liberadas e os elementos DOM dos `CSS3DObject` removidos à mão; sem isso o iframe do telão fica órfão no documento.
