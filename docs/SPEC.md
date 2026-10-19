@@ -172,7 +172,10 @@ Front estático na Vercel, sala num processo Node no Render. No plano gratuito o
 
 ## Personagens
 
-- `actors/personagem.js` carrega cada criatura de `public/modelos/personagens/`. São glTF autocontidos: geometria, esqueleto, animações e textura num arquivo só, entre 121 e 305KB.
+- `actors/personagem.js` carrega cada criatura de `public/modelos/personagens/`, em glb autocontido: geometria, esqueleto de 43 ossos, animações e textura num arquivo só, de 323 a 467KB.
+- O pacote traz duas versões de cada criatura. As da pasta Blob têm 4 ossos, nenhuma perna no esqueleto e vêm com Dance; as da pasta Big têm o esqueleto inteiro mas não têm dança. Usamos as Big: perna é estrutural, dança a gente escreve.
+- Os arquivos originais têm 1,2MB porque guardam o binário em base64, que infla um terço. Cortando as oito animações que não usamos e convertendo para glb com `gltf-transform prune`, caem para um terço disso.
+- Locomoção é animação do pacote (Idle, Walk, Run, Jump), com `timeScale` acompanhando a velocidade real. A dança é escrita: as ações do mixer saem de cena e os ossos são girados direto, com a rotação de bind guardada na criação e multiplicada pelo giro do quadro. Ao sair da dança, as rotações voltam ao bind, senão o personagem fica torto quando a animação retoma.
 - A escala é calculada no carregamento, pela altura da bounding box, para todos ficarem com 1,75m. Os modelos vêm em tamanhos bem diferentes entre si.
 - O estado vira animação em `update`: parado é Idle, andando é Walk com `timeScale` proporcional à velocidade, dançando é Dance. A troca usa `fadeIn`/`fadeOut` de 0,25s, senão o personagem salta de uma pose para outra.
 - `player/selecao.js` é a tela de escolha, com cena e renderer próprios num canvas pequeno. Carrega um personagem por vez, conforme você navega, em vez de baixar os oito de uma vez. Ao confirmar, o canvas sai da página e o renderer é descartado — dois contextos WebGL vivos ao mesmo tempo custam caro.
