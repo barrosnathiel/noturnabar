@@ -24,6 +24,13 @@
       #crosshair { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: #e8e8f0; opacity: .75; box-shadow: 0 0 3px #000; }
       #online { position: absolute; top: calc(30px + env(safe-area-inset-top)); right: calc(14px + env(safe-area-inset-right)); font-size: 12px; letter-spacing: .5px; opacity: .72; display: none; }
       #sound { position: absolute; top: calc(56px + env(safe-area-inset-top)); right: calc(14px + env(safe-area-inset-right)); font-size: 11px; letter-spacing: 1px; padding: 6px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,.2); background: rgba(14,14,20,.6); display: none; }
+      #porta { position: fixed; inset: 0; z-index: 7; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; background: #07070a; font-family: ui-monospace, Menlo, monospace; color: #d8d8e0; }
+      #porta .marca { font-size: 13px; letter-spacing: 4px; opacity: .7; }
+      #porta .recado { font-size: 11px; letter-spacing: 1px; opacity: .4; }
+      #porta input { width: min(260px, 74vw); padding: 13px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.04); color: #e4e4ec; font-family: inherit; font-size: 16px; letter-spacing: 3px; text-align: center; text-transform: uppercase; }
+      #porta input:focus { outline: none; border-color: rgba(140,160,220,.7); }
+      #porta button { padding: 12px 34px; border-radius: 8px; border: 1px solid rgba(255,255,255,.5); background: rgba(120,140,200,.4); color: #fff; font-family: inherit; font-size: 13px; letter-spacing: 2px; cursor: pointer; }
+      #porta .aviso { min-height: 14px; font-size: 11px; letter-spacing: .5px; color: #ff8a9a; }
       #conta { position: absolute; top: calc(52px + env(safe-area-inset-top)); right: calc(14px + env(safe-area-inset-right)); z-index: 6; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: auto; font-family: ui-monospace, Menlo, monospace; }
       #conta .chip { padding: 5px 11px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); background: rgba(14,14,20,.62); color: #cfcfdb; font-size: 10px; letter-spacing: 1px; cursor: pointer; }
       #acesso { width: min(280px, 76vw); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: rgba(12,12,18,.96); padding: 16px; display: none; flex-direction: column; gap: 10px; color: #d8d8e0; }
@@ -134,6 +141,13 @@
         <div id="full">TELA CHEIA</div>
         <div id="iosinfo">o Safari do iPhone não deixa um site entrar em tela cheia. Para jogar sem as barras: toque em Compartilhar e depois em Adicionar à Tela de Início, e abra por lá.</div>
       </div>
+    </div>
+    <div id="porta">
+      <div class="marca">NOTURNA BAR</div>
+      <div class="recado">a casa é fechada. entre com a sua chave.</div>
+      <input id="chave" type="text" inputmode="latin" autocomplete="off" spellcheck="false" placeholder="XXXX-XXXX-XXXX" />
+      <div class="aviso" id="avisoChave"></div>
+      <button id="destravar">ENTRAR</button>
     </div>
     <div id="conta">
       <div class="chip" id="chipConta">ENTRAR NA CONTA</div>

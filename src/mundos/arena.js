@@ -703,16 +703,7 @@ export const arena = {
       animar,
       spawn: new THREE.Vector3(-70, 0, 0),
       olhar: -Math.PI / 2,
-      portais: [
-        {
-          destino: 'lobby',
-          rotulo: 'lobby',
-          caixa: new THREE.Box3(
-            new THREE.Vector3(PISTA.x0 - 1, 0, -4),
-            new THREE.Vector3(PISTA.x0 + 3, 3.4, 4)
-          )
-        }
-      ]
+      portais: []
     }
   }
 }

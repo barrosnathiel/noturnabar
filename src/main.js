@@ -12,30 +12,23 @@ import { carregarPersonagem, criarPersonagem, IDS } from './actors/personagem.js
 import { createCamera } from './player/camera.js'
 import { createMenu } from './player/menu.js'
 import { createSelecao } from './player/selecao.js'
+import { abrirPorta } from './player/porta.js'
 import { createAcesso } from './player/acesso.js'
 import { sessao, nome as nomeDaConta } from './player/conta.js'
 import { conectarSala } from './net/sala.js'
-import { lobby } from './mundos/lobby.js'
-import { casa } from './mundos/casa.js'
 import { arena } from './mundos/arena.js'
 
-const MUNDOS = { lobby, casa, arena }
+const MUNDOS = { arena }
 const CAIXAS_DE_SOM = {
-  casa: [
-    new THREE.Vector3(12.2, 1.75, 8.6),
-    new THREE.Vector3(12.2, 2.75, 8.6),
-    new THREE.Vector3(12.2, 1.75, -8.6),
-    new THREE.Vector3(12.2, 2.75, -8.6)
-  ],
   arena: [
-    new THREE.Vector3(8.5, 10, 27),
-    new THREE.Vector3(8.5, 10, -27),
-    new THREE.Vector3(23, 14, 0)
+    new THREE.Vector3(8.5, 4, -27),
+    new THREE.Vector3(8.5, 12, -27),
+    new THREE.Vector3(8.5, 4, 27),
+    new THREE.Vector3(8.5, 12, 27)
   ]
 }
 
 const ALCANCE = {
-  casa: { perto: 5, longe: 46, piso: 0.18 },
   arena: { perto: 34, longe: 150, piso: 0.45 }
 }
 
@@ -132,21 +125,25 @@ function comecar(escolhido, comoChamar) {
   )
 }
 
-const logado = sessao()
-if (logado) {
-  let salvo = 'Alien'
-  try {
-    salvo = localStorage.getItem('noturnabar.personagem') || salvo
-  } catch (erro) {
-    void erro
+function escancarar() {
+  if (sessao()) {
+    let salvo = 'Alien'
+    try {
+      salvo = localStorage.getItem('noturnabar.personagem') || salvo
+    } catch (erro) {
+      void erro
+    }
+    const tela = document.getElementById('escolha')
+    if (tela) tela.remove()
+    document.body.classList.add('jogando')
+    comecar(salvo, nomeDaConta())
+  } else {
+    createSelecao((escolhido, comoChamar) => comecar(escolhido, comoChamar))
   }
-  const tela = document.getElementById('escolha')
-  if (tela) tela.remove()
-  document.body.classList.add('jogando')
-  comecar(salvo, nomeDaConta())
-} else {
-  createSelecao((escolhido, comoChamar) => comecar(escolhido, comoChamar))
+  entrar('arena')
 }
+
+abrirPorta(escancarar)
 
 const FIGURANTES = Math.min(
   parseInt(new URLSearchParams(location.search).get('multidao') || '0', 10) || 0,
@@ -188,7 +185,7 @@ function descartar(mundo) {
 }
 
 function entrar(nome) {
-  const receita = MUNDOS[nome] || MUNDOS.lobby
+  const receita = MUNDOS[nome] || MUNDOS.arena
   if (atual) descartar(atual.mundo)
   const mundo = receita.construir()
   scene.add(mundo.grupo)
@@ -264,7 +261,6 @@ window.addEventListener('resize', () => {
   renderer.setClearColor(0x07070a, 0)
 })
 
-entrar(new URLSearchParams(location.search).get('lugar') || (logado ? 'arena' : 'lobby'))
 
 
 const warmUp = renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve()
@@ -280,6 +276,10 @@ let last = performance.now()
 function frame(now = performance.now()) {
   const dt = Math.min((now - last) / 1000, 0.05)
   last = now
+  if (!atual) {
+    requestAnimationFrame(frame)
+    return
+  }
   const input = controls.sample(dt)
   player.update(dt, input, controls.forward, controls.right)
 

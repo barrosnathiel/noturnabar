@@ -87,6 +87,8 @@ Toda mudança pedida passa por uma pergunta: está na lista "Dentro"? Se não es
 
 **19/10/2026 — conta opcional.** Entrar continua livre: quem não quer conta escolhe personagem, digita um nome e entra no lobby. Quem quiser cria conta com email e senha num painel flutuante ao lado do contador de gente online; com a conta ativa, abrir o jogo cai direto na arena com o nome da conta, sem passar pela escolha. As contas ficam no localStorage do navegador (senha guardada como hash SHA-256), sem servidor e sem validação de email — serve pro fluxo, não é autenticação de verdade. O nome vai junto na identificação da sala e aparece numa etiqueta sobre a cabeça do avatar, sumindo acima de 25m.
 
+**19/10/2026 — casa fechada, só a arena.** O lobby e a casa de show saíram: o jogo abre direto na arena e os portais foram removidos. Antes de qualquer coisa a tela pede uma chave no formato XXXX-XXXX-XXXX; dez chaves foram geradas e o repositório guarda só o SHA-256 de cada uma, em `src/player/chaves.js`. A chave que funciona fica salva no navegador e não é pedida de novo. A conferência é no cliente: serve pra fechar a porta pra quem não tem o link, não é controle de acesso de verdade — chave vazada só sai de circulação com uma versão nova no ar.
+
 ## Verificação da v1 (18/10/2026)
 
 Passou, verificado automaticamente no navegador:
